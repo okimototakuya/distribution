@@ -15,7 +15,7 @@ def main():
     mu = 0      # 平均値
     #x = [random.gauss(mu=0, sigma=1) for _ in range(sample_size)]
     x = np.linspace(-3, 3, sample_size)
-    gauss_y = gauss(x, mu=0, sigma=1)
+    gauss_y = gauss(x, mu=mu, sigma=sigma)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(x, gauss_y)
