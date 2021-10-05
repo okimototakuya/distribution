@@ -17,16 +17,18 @@ def gauss(x, mu, sigma):
 
 def multidim_gauss(x, mu, sigma):
     '''
+    Notes
+    -----
+    - https://qiita.com/g-k/items/698c7f9e4a213d73197b
     '''
-    d = x.ndim
+    d = x.T.ndim
     #分散共分散行列の行列式
     det = np.linalg.det(sigma)
-    print(det)
     #分散共分散行列の逆行列
-    inv = np.linalg.inv(sigma)
-    n = x.ndim
-    print(inv)
-    return np.exp(-np.diag((x - mu)@inv@(x - mu).T)/2.0) / (np.sqrt((2 * np.pi) ** n * det))    # [注]. 横ベクトルがデフォルト
+    inv = np.linalg.inv(sigma)      # np.matrix型
+    val = np.exp(-(x - mu).T@inv@(x - mu)/2.0)    \
+               / (np.sqrt((2*np.pi)**d * det))     # [注]. 横ベクトルがデフォルト
+    return np.diag(val)     # 対角成分の抽出. → 2021/10/6: 何故これでプロットできるようになったのか不明.
 
 def mixed_gauss(x, input_gauss):
     '''
@@ -36,6 +38,8 @@ def mixed_gauss(x, input_gauss):
     return mixed_gauss_y
 
 def main():
+    '''
+    '''
     # 1. 座標軸の設定
     #x = np.linspace(-3, 3, sample_size)        # 単変量
     x = y = np.linspace(-3, 3, sample_size)     # ２変量
@@ -43,16 +47,17 @@ def main():
     z = np.c_[X.ravel(),Y.ravel()]
     # 2. ガウス分布の密度関数
     #gauss_y = gauss(x, mu=0, sigma=1)           # (単変量)ガウス分布
-    gauss_Z = multidim_gauss(z, mu=np.array([0, 0]), sigma=np.array([[1, 0], [0, 1]]))  # 多変量ガウス分布
+    #Z = multidim_gauss(z, mu=np.array([0, 0]), sigma=np.array([[1, 0], [0, 1]]))  # 多変量ガウス分布
+    Z = multidim_gauss(z.T, mu=np.matrix([0, 0]).T, sigma=np.matrix([[1, 0], [0, 1]]))  # 多変量ガウス分布
     #gauss_y = mixed_gauss(x, gauss_y)     # (単変量)混合ガウス分布
     # 3. ガウス分布のプロット
     shape = X.shape
-    gauss_Z = gauss_Z.reshape(shape)
+    Z = Z.reshape(shape)
     fig = plt.figure()
     #ax = fig.add_subplot(111)
     ax = fig.add_subplot(111, projection='3d')
     #ax.plot(x, gauss_y)
-    ax.plot_surface(X, Y, gauss_Z, rstride=1, cstride=1, cmap=cm.coolwarm)
+    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm)
     plt.show()
 
 

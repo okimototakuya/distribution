@@ -40,6 +40,8 @@ class TestGauss(unittest.TestCase):
         np.testing.assert_array_equal(gauss_y, mixed_gauss_y)
 
     def test_multidim_gauss(self):
+        '''
+        '''
         self.assertEqual(gauss.gauss(self.x, 0, 1), gauss.multidim_gauss(self.x, 0, 1))
 
 
