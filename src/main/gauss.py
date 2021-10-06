@@ -10,6 +10,11 @@ sample_size = 100   # サンプルサイズ
 def gauss(x, mu, sigma):
     '''
     (単峰)ガウス分布を、np.ndarray型で返す.
+
+    Note
+    -----
+    - numpy=1.20.1/numpy-base=1.20.1の環境において、multidim_gaussのパラメータを1次元にした場合、返り値が一致した.
+    - ↑ただし、標準正規分布の場合について。
     '''
     gauss_y = np.exp(-(x-mu)**2 / 2*sigma**2)     \
                     / np.sqrt(2 * np.pi * sigma**2)     # 上行:密度関数の本体, 下行:規格化定数
@@ -19,16 +24,16 @@ def multidim_gauss(x, mu, sigma):
     '''
     Notes
     -----
-    - https://qiita.com/g-k/items/698c7f9e4a213d73197b
+    - [参考]: https://qiita.com/g-k/items/698c7f9e4a213d73197b
     '''
     d = x.T.ndim
     #分散共分散行列の行列式
     det = np.linalg.det(sigma)
     #分散共分散行列の逆行列
     inv = np.linalg.inv(sigma)      # np.matrix型
-    val = np.exp(-(x - mu).T@inv@(x - mu)/2.0)    \
-               / (np.sqrt((2*np.pi)**d * det))     # [注]. 横ベクトルがデフォルト
-    return np.diag(val)     # 対角成分の抽出. → 2021/10/6: 何故これでプロットできるようになったのか不明.
+    matrix_z = np.exp(-(x - mu).T@inv@(x - mu)/2.0)    \
+               / (np.sqrt((2*np.pi)**d * det))     # 引数をnp.matrix型で与えた場合, 返り値もnp.matrix型.
+    return np.diag(matrix_z)     # 対角成分の抽出. → 2021/10/6: ToDo: 何故これでプロットできるようになったのか不明.
 
 def mixed_gauss(x, input_gauss):
     '''
