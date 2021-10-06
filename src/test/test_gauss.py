@@ -22,7 +22,7 @@ class TestGauss(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_gauss_mixedgauss_parameter(self):
+    def _test_gauss_mixedgauss_parameter(self):
         '''
         gaussモジュールについて、関数mixed_gaussの引数をx (np.ndarray) とinput_gauss (np.ndarray) の2つに変更し、
         正しく動作 (np.ndarray型を返すかどうか) を確認.
@@ -30,7 +30,7 @@ class TestGauss(unittest.TestCase):
         mixed_gauss_y = gauss.mixed_gauss(self.x, gauss.gauss(self.x, 0, 1))
         self.assertIsInstance(mixed_gauss_y, np.ndarray)  # numpy.ndarray配列型かアサーション
 
-    def test_mixed_gauss_given_1_standard_gauss(self):
+    def _test_mixed_gauss_given_1_standard_gauss(self):
         '''
         関数mixed_gaussについて、関数gaussと関数mixed_gaussの出力 (np.ndarray型) が一致するか確認.
         ただし、関数mixed_gaussが受け取る引数は、xと1つの標準正規分布のみ。
