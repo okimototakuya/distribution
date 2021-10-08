@@ -57,19 +57,20 @@ def mixed_gauss(x, *input_gauss):
     Parameters
     -----
     x: 2021.10.8[HACK]: input_gaussを引数にしており、不要？
-    input_gauss: ガウス分布の密度関数 (np.ndarray型)
+    input_gauss: ガウス分布の密度関数 (np.ndarray型) とその混合率のタプルを要素に持つタプル
     '''
-    mixed_gauss_y = sum(input_gauss)
+    # input_gauss[i][0]: ガウス分布の密度関数 (np.ndarray型), input_gauss[i][1]: 混合率
+    mixed_gauss_y = sum(input_gauss[i][0] * input_gauss[i][1] for i in range(len(input_gauss)))
     return mixed_gauss_y
 
 def main():
     '''
     分布をプロットする.
     '''
-    #mu = 0                     # 通った
-    #sigma = 1
-    mu = [0, 0]                # 通った
-    sigma = [[2, 1], [1, 3]]
+    mu = 0                     # 通った
+    sigma = 1
+    #mu = [0, 0]                # 通った
+    #sigma = [[2, 1], [1, 3]]
     #mu = [0]                    # 通らない
     #sigma = [1]                # 2021/10/7: FIXME: テストスクリプトより、分布の定義までは正常に動作するが、プロットについては１次元の方法をとらなければいけない。
     #if type(mu)=='int' or len(mu) == 1:
@@ -79,7 +80,7 @@ def main():
         # 2. ガウス分布の密度関数
         gauss_y = gauss(x, mu=mu, sigma=np.sqrt(sigma))                             # 単変量ガウス分布 (gauss.gauss)
         #gauss_y = multidim_gauss(x.T, mu=np.matrix([0]).T, sigma=np.matrix([5]))   # (一般に)多変量ガウス分布 (gauss.multidim_gauss)
-        #gauss_y = mixed_gauss(x, gauss_y)                                          # (単変量)混合ガウス分布 (gauss.mixed_gauss)
+        mixed_gauss_y = mixed_gauss(x, (gauss_y, 1/2), (gauss_y, 1/2))                                          # (単変量)混合ガウス分布 (gauss.mixed_gauss)
         # 3. ガウス分布のプロット
         fig = plt.figure()
         ax = fig.add_subplot(111)
