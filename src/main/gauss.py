@@ -70,34 +70,37 @@ def main():
     '''
     分布をプロットする.
     '''
-    mu = 0                     # 通った
-    sigma = 1
-    #mu = [0, 0]                # 通った
-    #sigma = [[2, 1], [1, 3]]
+    #mu = 0                     # 通った
+    #sigma = 1
+    mu = [0, 0]                # 通った
+    sigma = [[2, 1], [1, 3]]
     #mu = [0]                    # 通らない
     #sigma = [1]                # 2021/10/7: FIXME: テストスクリプトより、分布の定義までは正常に動作するが、プロットについては１次元の方法をとらなければいけない。
     #if type(mu)=='int' or len(mu) == 1:
-    if type(mu)==int:
+    if type(mu)==int:           # 単変量の分布
         # 1. 座標軸の設定
         x = np.linspace(-3, 3, sample_size)
         # 2. ガウス分布の密度関数
-        gauss_y = gauss(x, mu=mu, sigma=np.sqrt(sigma))                             # 単変量ガウス分布 (gauss.gauss)
+        gauss_y = gauss(x, mu=mu, sigma=np.sqrt(sigma))                             # ガウス分布 (gauss.gauss)
         #gauss_y = multidim_gauss(x.T, mu=np.matrix([0]).T, sigma=np.matrix([5]))   # (一般に)多変量ガウス分布 (gauss.multidim_gauss)
-        gauss_y_a = gauss(x, mu=-2, sigma=np.sqrt(2))
+        gauss_y_a = gauss(x, mu=-2, sigma=np.sqrt(2))                               # 混合ガウス分布 (gauss.mixed_gauss)
         gauss_y_b = gauss(x, mu=2, sigma=np.sqrt(3/2))
-        mixed_gauss_y = mixed_gauss(x, (gauss_y_a, 3/4), (gauss_y_b, 1/4))   # (単変量)混合ガウス分布 (gauss.mixed_gauss)
+        mixed_gauss_y = mixed_gauss(x, (gauss_y_a, 3/4), (gauss_y_b, 1/4))
         # 3. ガウス分布のプロット
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.plot(x, mixed_gauss_y)
     #elif len(mu) == 2:
-    elif type(mu)==list:
+    elif type(mu)==list:        # 2変量の分布
         # 1. 座標軸の設定
         x = y = np.linspace(-3, 3, sample_size)
         X, Y = np.meshgrid(x, y)
         z = np.c_[X.ravel(),Y.ravel()]
         # 2. ガウス分布の密度関数
-        Z = multidim_gauss(z.T, mu=np.matrix(mu).T, sigma=np.matrix(sigma))  # 多変量ガウス分布 (gauss.multidim_gauss)
+        #Z = multidim_gauss(z.T, mu=np.matrix(mu).T, sigma=np.matrix(sigma))                        # ガウス分布 (gauss.multidim_gauss)
+        gauss_z_a = multidim_gauss(z.T, mu=np.matrix([-2,2]).T, sigma=np.matrix([[1,0],[0,1]]))     # 混合ガウス分布 (gauss.mixed_gauss)
+        gauss_z_b = multidim_gauss(z.T, mu=np.matrix([3,-3]).T, sigma=np.matrix([[1,0],[0,1]]))
+        Z = mixed_gauss(z, (gauss_z_a, 3/4), (gauss_z_b, 1/4))
         # 3. ガウス分布のプロット
         shape = X.shape
         Z = Z.reshape(shape)
@@ -105,7 +108,7 @@ def main():
         ax = fig.add_subplot(111, projection='3d')
         ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm)
     #elif len(mu) == 3:
-    elif type(mu) == float:
+    elif type(mu) == float:     # 3変量の分布
         pass
     else:
         raise Exception('プロットするのに、分布の次元数が不適切です.')
