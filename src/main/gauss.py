@@ -17,6 +17,12 @@ def gauss(x, mu, sigma):
     mu: 期待値スカラー (int)
     sigma: 標準偏差スカラー (int)   注. sigmaは分散でなく、標準偏差であることに注意すること. 
 
+    Returns
+    -----
+    - gauss_y: 密度関数の各点ごとの確率値を格納する...↓
+    -- float型変数: xがintの場合
+    -- numpy.ndarray型配列: xがnp.ndarrayもしくはnp.matrixの場合
+
     Note
     -----
     - numpy=1.20.1/numpy-base=1.20.1の環境において、multidim_gaussのパラメータを1次元にした場合、返り値が一致した.
@@ -36,6 +42,13 @@ def multidim_gauss(x, mu, sigma):
     x: 確率変数値 (int, numpy.ndarray, numpy.matrix)
     mu: 期待値ベクトル (numpy.matrix配列の転置)
     sigma: 共分散分散行列 (numpy.matrix行列)            # 1変量分布の場合、標準偏差でなく分散を与えること.
+
+    Returns
+    -----
+    - matrix_z: 密度関数の各点ごとの確率値を格納する...↓
+    -- float型変数: xがintの場合
+    -- numpy.matrix型配列: xがnp.ndarrayもしくはnp.matrixの場合
+    - np.diag(matrix_z): ↑その対角成分
 
     Notes
     -----
@@ -58,6 +71,12 @@ def mixed_gauss(x, *input_gauss):
     -----
     x: 2021.10.8[HACK]: input_gaussを引数にしており、不要？
     input_gauss: ガウス分布の密度関数 (np.ndarray型) とその混合率のタプルを要素に持つタプル
+
+    Returns
+    -----
+    - mixed_gauss_y: 密度関数の各点ごとの確率値を格納する...↓
+    -- float型変数: xがintの場合
+    -- numpy.ndarray型配列: xがnp.ndarrayもしくはnp.matrixの場合
     '''
     if sum(input_gauss[i][1] for i in range(len(input_gauss))) != 1:
         raise Exception('混合率の和が1ではありません。')
