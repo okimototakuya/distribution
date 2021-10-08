@@ -50,11 +50,16 @@ def multidim_gauss(x, mu, sigma):
                / (np.sqrt((2*np.pi)**d * det))     # 引数をnp.matrix型で与えた場合, 返り値もnp.matrix型.
     return np.diag(matrix_z)     # 対角成分の抽出. → 2021/10/6: ToDo: 何故これでプロットできるようになったのか不明.
 
-def mixed_gauss(x, input_gauss):
+def mixed_gauss(x, *input_gauss):
     '''
     混合ガウス分布を、np.ndarray型で返す.
+
+    Parameters
+    -----
+    x: 2021.10.8[HACK]: input_gaussを引数にしており、不要？
+    input_gauss: ガウス分布の密度関数 (np.ndarray型)
     '''
-    mixed_gauss_y = np.array(input_gauss)
+    mixed_gauss_y = sum(input_gauss)
     return mixed_gauss_y
 
 def main():

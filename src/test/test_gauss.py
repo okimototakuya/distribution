@@ -36,10 +36,19 @@ class TestGauss(unittest.TestCase):
         ただし、関数mixed_gaussが受け取る引数は、xと1つの標準正規分布のみ。
         '''
         gauss_y = gauss.gauss(self.x, 0, 1)
-        mixed_gauss_y = gauss.mixed_gauss(self.x,gauss_y)
+        mixed_gauss_y = gauss.mixed_gauss(self.x, gauss_y)
         np.testing.assert_array_equal(gauss_y, mixed_gauss_y)   # 通る.
 
-    def test_multidim_gauss_given_1_dimensional_parameter(self):
+    def test_mixed_gauss_given_2_standard_gauss(self):
+        '''
+        関数mixed_gaussについて、関数gaussの出力の2倍と関数mixed_gaussの出力 (np.ndarray型) が一致するか確認.
+        ただし、関数mixed_gaussが受け取る引数は、xと2つの標準正規分布のみ。
+        '''
+        gauss_y = gauss.gauss(self.x, 0, 1)
+        mixed_gauss_y = gauss.mixed_gauss(self.x, gauss_y, gauss_y)
+        np.testing.assert_array_equal(gauss_y*2, mixed_gauss_y)   # 通る.
+
+    def _test_multidim_gauss_given_1_dimensional_parameter(self):
         '''
         gaussモジュールについて、関数multidim_gaussに1次元の引数を与えた場合に、関数gaussと関数multidim_gaussの返す値が一致するかテスト.
         '''
