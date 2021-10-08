@@ -59,9 +59,12 @@ def mixed_gauss(x, *input_gauss):
     x: 2021.10.8[HACK]: input_gaussを引数にしており、不要？
     input_gauss: ガウス分布の密度関数 (np.ndarray型) とその混合率のタプルを要素に持つタプル
     '''
-    # input_gauss[i][0]: ガウス分布の密度関数 (np.ndarray型), input_gauss[i][1]: 混合率
-    mixed_gauss_y = sum(input_gauss[i][0] * input_gauss[i][1] for i in range(len(input_gauss)))
-    return mixed_gauss_y
+    if sum(input_gauss[i][1] for i in range(len(input_gauss))) != 1:
+        raise Exception('混合率の和が1ではありません。')
+    else:
+        # input_gauss[i][0]: ガウス分布の密度関数 (np.ndarray型), input_gauss[i][1]: 混合率
+        mixed_gauss_y = sum(input_gauss[i][0] * input_gauss[i][1] for i in range(len(input_gauss)))
+        return mixed_gauss_y
 
 def main():
     '''
@@ -80,11 +83,13 @@ def main():
         # 2. ガウス分布の密度関数
         gauss_y = gauss(x, mu=mu, sigma=np.sqrt(sigma))                             # 単変量ガウス分布 (gauss.gauss)
         #gauss_y = multidim_gauss(x.T, mu=np.matrix([0]).T, sigma=np.matrix([5]))   # (一般に)多変量ガウス分布 (gauss.multidim_gauss)
-        mixed_gauss_y = mixed_gauss(x, (gauss_y, 1/2), (gauss_y, 1/2))                                          # (単変量)混合ガウス分布 (gauss.mixed_gauss)
+        gauss_y_a = gauss(x, mu=-2, sigma=np.sqrt(2))
+        gauss_y_b = gauss(x, mu=2, sigma=np.sqrt(3/2))
+        mixed_gauss_y = mixed_gauss(x, (gauss_y_a, 3/4), (gauss_y_b, 1/4))   # (単変量)混合ガウス分布 (gauss.mixed_gauss)
         # 3. ガウス分布のプロット
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.plot(x, gauss_y)
+        ax.plot(x, mixed_gauss_y)
     #elif len(mu) == 2:
     elif type(mu)==list:
         # 1. 座標軸の設定
