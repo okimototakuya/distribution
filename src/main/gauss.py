@@ -100,19 +100,14 @@ def main():
 　  - 混合ガウス分布などは、パラメータが多いため。
 　  - ↑そのように変更する場合、分岐の条件設定も変える必要がある。
     '''
-    #mu = 0                     # 通った
-    #sigma = 1
-    mu = [0, 0]                # 通った
-    sigma = [[2, 1], [1, 3]]
-    #mu = [0]                    # 通らない
-    #sigma = [1]
-    config_ = config.Conf()
+    #config_ = config.Conf()
     #if type(config_.mu)=='int' or len(config_.mu) == 1:
-    if type(config_.mu)==int:           # 単変量の分布
+    #if type(config_.mu)==int:           # 単変量の分布
+    if False:
         # 1. 座標軸の設定
         x = np.linspace(-3, 3, config_.sample_size)
         # 2. ガウス分布の密度関数
-        gauss_y = gauss(x, mu=config_.mu, sigma=np.sqrt(config_.sigma))                             # ガウス分布 (gauss.gauss)
+        gauss_y = gauss(x, mu=config_.mu, sigma=np.sqrt(config_.sigma))             # ガウス分布 (gauss.gauss)
         #gauss_y = multidim_gauss(x.T, mu=np.matrix([0]).T, sigma=np.matrix([5]))   # (一般に)多変量ガウス分布 (gauss.multidim_gauss)
         gauss_y_a = gauss(x, mu=-2, sigma=np.sqrt(2))                               # 混合ガウス分布 (gauss.mixed_gauss)
         gauss_y_b = gauss(x, mu=2, sigma=np.sqrt(3/2))
@@ -122,16 +117,20 @@ def main():
         ax = fig.add_subplot(111)
         ax.plot(x, mixed_gauss_y)
     #elif len(config_.mu) == 2:
-    elif type(config_.mu)==list:        # 2変量の分布
+    #elif type(config_.mu)==list:        # 2変量の分布
+    elif True:
         # 1. 座標軸の設定
-        x = y = np.linspace(-3, 3, config_.sample_size)
+        sample_size = 100
+        x = y = np.linspace(-3, 3, sample_size)
         X, Y = np.meshgrid(x, y)
         z = np.c_[X.ravel(),Y.ravel()]
+        config_ = config.Conf(z)
         # 2. ガウス分布の密度関数
-        #Z = multidim_gauss(z.T, mu=np.matrix(config_.mu).T, sigma=np.matrix(config_.sigma))                        # ガウス分布 (gauss.multidim_gauss)
-        gauss_z_a = multidim_gauss(z.T, mu=np.matrix([-2,2]).T, sigma=np.matrix([[1,0],[0,1]]))     # 混合ガウス分布 (gauss.mixed_gauss)
-        gauss_z_b = multidim_gauss(z.T, mu=np.matrix([3,-3]).T, sigma=np.matrix([[1,0],[0,1]]))
-        Z = mixed_gauss(z, (gauss_z_a, 3/4), (gauss_z_b, 1/4))
+        #Z = multidim_gauss(z.T, mu=np.matrix(config_.mu).T, sigma=np.matrix(config_.sigma))        # ガウス分布 (gauss.multidim_gauss)
+        #gauss_z_a = multidim_gauss(z.T, mu=np.matrix([-2,2]).T, sigma=np.matrix([[1,0],[0,1]]))     # 混合ガウス分布 (gauss.mixed_gauss)
+        #gauss_z_b = multidim_gauss(z.T, mu=np.matrix([3,-3]).T, sigma=np.matrix([[1,0],[0,1]]))
+        #Z = mixed_gauss(z, (gauss_z_a, 3/4), (gauss_z_b, 1/4))
+        Z = config_.Z
         # 3. ガウス分布のプロット
         shape = X.shape
         Z = Z.reshape(shape)
