@@ -119,17 +119,13 @@ def main():
     #elif len(config_.mu) == 2:
     #elif type(config_.mu)==list:        # 2変量の分布
     elif True:
-        # 1. 座標軸の設定
         sample_size = 100
+        # 1. 座標軸の設定
         x = y = np.linspace(-3, 3, sample_size)
         X, Y = np.meshgrid(x, y)
         z = np.c_[X.ravel(),Y.ravel()]
         config_ = config.Conf(z)
-        # 2. ガウス分布の密度関数
-        #Z = multidim_gauss(z.T, mu=np.matrix(config_.mu).T, sigma=np.matrix(config_.sigma))        # ガウス分布 (gauss.multidim_gauss)
-        #gauss_z_a = multidim_gauss(z.T, mu=np.matrix([-2,2]).T, sigma=np.matrix([[1,0],[0,1]]))     # 混合ガウス分布 (gauss.mixed_gauss)
-        #gauss_z_b = multidim_gauss(z.T, mu=np.matrix([3,-3]).T, sigma=np.matrix([[1,0],[0,1]]))
-        #Z = mixed_gauss(z, (gauss_z_a, 3/4), (gauss_z_b, 1/4))
+        # 2. 密度関数の出力
         Z = config_.Z
         # 3. ガウス分布のプロット
         shape = X.shape
