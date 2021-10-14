@@ -93,51 +93,23 @@ def main():
     FIXME: 2021/10/7
     -----
     テストスクリプトより、分布の定義までは正常に動作するが、プロットについては１次元の方法をとらなければいけない。
-
-    FIXME: 2021.10.8
-    -----
-    main関数冒頭に分布のパラメータを書いていたが、各々の密度関数を定義した際にパラメータを書くのがいいかも。
-　  - 混合ガウス分布などは、パラメータが多いため。
-　  - ↑そのように変更する場合、分岐の条件設定も変える必要がある。
     '''
-    #config_ = config.Conf()
-    #if type(config_.mu)=='int' or len(config_.mu) == 1:
-    #if type(config_.mu)==int:           # 単変量の分布
-    if False:
-        # 1. 座標軸の設定
-        x = np.linspace(-3, 3, config_.sample_size)
-        # 2. ガウス分布の密度関数
-        gauss_y = gauss(x, mu=config_.mu, sigma=np.sqrt(config_.sigma))             # ガウス分布 (gauss.gauss)
-        #gauss_y = multidim_gauss(x.T, mu=np.matrix([0]).T, sigma=np.matrix([5]))   # (一般に)多変量ガウス分布 (gauss.multidim_gauss)
-        gauss_y_a = gauss(x, mu=-2, sigma=np.sqrt(2))                               # 混合ガウス分布 (gauss.mixed_gauss)
-        gauss_y_b = gauss(x, mu=2, sigma=np.sqrt(3/2))
-        mixed_gauss_y = mixed_gauss(x, (gauss_y_a, 3/4), (gauss_y_b, 1/4))
-        # 3. ガウス分布のプロット
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.plot(x, mixed_gauss_y)
-    #elif len(config_.mu) == 2:
-    #elif type(config_.mu)==list:        # 2変量の分布
-    elif True:
-        sample_size = 100
-        # 1. 座標軸の設定
-        x = y = np.linspace(-3, 3, sample_size)
-        X, Y = np.meshgrid(x, y)
-        z = np.c_[X.ravel(),Y.ravel()]
-        config_ = config.Conf(z)
-        # 2. 密度関数の出力
-        Z = config_.Z
-        # 3. ガウス分布のプロット
-        shape = X.shape
-        Z = Z.reshape(shape)
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm)
-    #elif len(config_.mu) == 3:
-    elif type(config_.mu) == float:     # 3変量の分布
-        pass
-    else:
-        raise Exception('プロットするのに、分布の次元数が不適切です.')
+    # 0, サンプルサイズの設定
+    sample_size = 100
+    # 1. 座標軸の設定
+    x = y = np.linspace(-3, 3, sample_size)
+    X, Y = np.meshgrid(x, y)
+    z = np.c_[X.ravel(),Y.ravel()]
+    # 2. 密度関数の出力
+    config_ = config.Conf(z)
+    Z = config_.Z
+    # 3. ガウス分布のプロット
+    shape = X.shape
+    Z = Z.reshape(shape)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm)
+    # 4. プロットの表示
     plt.show()
 
 

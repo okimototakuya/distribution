@@ -6,6 +6,7 @@ import gauss
 
 class Conf():
     '''
+    gauss.pyで扱う分布のパラメータを管理するクラス
     '''
 
     def __init__(self, input_z):
