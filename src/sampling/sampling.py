@@ -2,7 +2,7 @@ import random
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-sys.path.append('.')
+sys.path.append('../distribution')
 import gauss
 
 sample_list = []
