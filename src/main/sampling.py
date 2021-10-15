@@ -58,9 +58,13 @@ def metropolis_hastings(p):
 
 def main():
     # 1. 所望の分布
-    mu = 0
-    sigma = 1
-    p = lambda theta: gauss.gauss(theta, mu=mu, sigma=sigma)    # theta : intまたはnp.ndarray
+    #mu = 0                                                         # 単変量ガウス分布
+    #sigma = 1
+    #p = lambda theta: gauss.gauss(theta, mu=mu, sigma=sigma)       # theta : intまたはnp.ndarray
+    p = lambda theta: gauss.mixed_gauss(theta,  \
+                                        (gauss.gauss(theta, mu=0, sigma=1), 1/4),   \
+                                        (gauss.gauss(theta, mu=5, sigma=1), 1/4),   \
+                                        (gauss.gauss(theta, mu=3, sigma=1), 2/4))   # 単変量混合ガウス分布
     # 2. 標本列の生成
     #metropolis(p)   # メトロポリス法
     metropolis_hastings(p)   # メトロポリス・ヘイスティングス法
