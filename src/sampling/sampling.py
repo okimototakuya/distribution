@@ -57,6 +57,18 @@ def metropolis_hastings(p):
         else: # 拒否
             sample_list.append(sample_list[i])  # 1つ前の標本を保持
 
+def sample_mixed_gauss(p):
+    '''
+    '''
+    rate = 3/4
+    for i in range(100000):
+        u = np.random.rand()
+        if u < rate:
+            sample_list.append(np.random.normal(0, 1))
+        else:
+            sample_list.append(np.random.normal(3, 1))
+
+
 def main():
     #config_ = config.Conf()     # オブジェクトを生成 (↓ヒストグラムのプロットまでの処理は全てコメントアウト.)
     # 1. 所望の分布
