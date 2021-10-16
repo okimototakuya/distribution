@@ -61,27 +61,40 @@ def sample_mixed_gauss(mu, sigma, rate):
     '''
     GMMのサンプリング
 
+    Parameters
+    -----
+    - mu: list
+        期待値
+    - sigma: list
+        分散/標準偏差
+    - rate: list
+        混合率
+
     Notes
     -----
-    - 単峰ガウス分布を混合率で制御することにより、混合ガウス分布をサンプリングする.
+    - 単峰ガウス分布を混合率と一様分布乱数で制御することにより、混合ガウス分布をサンプリングする.
     '''
-    if sum(rate) != 1:
+    if round(sum(rate)) != 1:
         raise Exception('混合率の和が1でありません.')
     else:
         for i in range(100000):
             u = np.random.rand()
-            if u < rate[0]:
-                sample_list.append(np.random.normal(mu[0], sigma[0]))
-            elif rate[0] <= u < rate[1]+rate[0]:
-                sample_list.append(np.random.normal(mu[1], sigma[1]))
-            else:
-                sample_list.append(np.random.normal(mu[2], sigma[2]))
+            sum_ = 0
+            for i in range(len(rate)):
+                if sum_ < u < rate[i]+sum_:
+                # 2021.10.16: Notice: ↑内包表記で書こうと試みたが...
+                # if [sum_ < u < rate[i]+sum_ for i in range(len(rate))].any():
+                # 注1. anyは標準リストではサポートなし。 また、内包表記ではすべての要素を見るため効率が悪い。適当なインデックスをif文に検知させるのも難しそう。
+                # 注2. 逆に、for文による内包表記の中にif文を組み込むのは、よくあるやり方。
+                    sample_list.append(np.random.normal(mu[i], sigma[i]))
+                    break
+                sum_ += rate[i]
 
 
 def main():
     #config_ = config.Conf()     # オブジェクトを生成 (↓ヒストグラムのプロットまでの処理は全てコメントアウト.)
     # 1. 所望の分布
-    #mu = 0                                                         # 単変量ガウス分布
+    #mu = 0                                                                         # 単変量ガウス分布
     #sigma = 1
     #p = lambda theta: gauss.gauss(theta, mu=mu, sigma=sigma)       # theta : intまたはnp.ndarray
     p = lambda theta: gauss.mixed_gauss(theta,  \
@@ -89,9 +102,12 @@ def main():
                                         (gauss.gauss(theta, mu=5, sigma=1), 1/4),   \
                                         (gauss.gauss(theta, mu=3, sigma=1), 2/4))   # 単変量混合ガウス分布
     # 2. 標本列の生成
-    #metropolis(p)                                                                  # メトロポリス法
-    #metropolis_hastings(p)                                                         # メトロポリス・ヘイスティングス法
-    sample_mixed_gauss(mu = [0, 3, 6], sigma = [1, 1, 1], rate = [2/4, 1/4, 1/4])   # GMMのサンプリング
+    #metropolis(p)                                          # メトロポリス法
+    #metropolis_hastings(p)                                 # メトロポリス・ヘイスティングス法
+    sample_mixed_gauss(mu = [0, 3, 6, 9, 12],               # GMMのサンプリング
+                       sigma = [1, 1, 1, 1, 1],
+                       rate = [1/6, 1/6, 2/6, 1/6, 1/6],
+                      )
     # 3. 標本列のヒストグラム
     fig = plt.figure()
     ax = fig.add_subplot(111)
