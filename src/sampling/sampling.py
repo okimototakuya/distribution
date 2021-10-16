@@ -59,6 +59,11 @@ def metropolis_hastings(p):
 
 def sample_mixed_gauss(mu, sigma, rate):
     '''
+    GMMのサンプリング
+
+    Notes
+    -----
+    - 単峰ガウス分布を混合率で制御することにより、混合ガウス分布をサンプリングする.
     '''
     if sum(rate) != 1:
         raise Exception('混合率の和が1でありません.')
@@ -67,8 +72,10 @@ def sample_mixed_gauss(mu, sigma, rate):
             u = np.random.rand()
             if u < rate[0]:
                 sample_list.append(np.random.normal(mu[0], sigma[0]))
-            else:
+            elif rate[0] <= u < rate[1]+rate[0]:
                 sample_list.append(np.random.normal(mu[1], sigma[1]))
+            else:
+                sample_list.append(np.random.normal(mu[2], sigma[2]))
 
 
 def main():
@@ -82,9 +89,9 @@ def main():
                                         (gauss.gauss(theta, mu=5, sigma=1), 1/4),   \
                                         (gauss.gauss(theta, mu=3, sigma=1), 2/4))   # 単変量混合ガウス分布
     # 2. 標本列の生成
-    #metropolis(p)   # メトロポリス法
-    #metropolis_hastings(p)   # メトロポリス・ヘイスティングス法
-    sample_mixed_gauss(p)
+    #metropolis(p)                                                                  # メトロポリス法
+    #metropolis_hastings(p)                                                         # メトロポリス・ヘイスティングス法
+    sample_mixed_gauss(mu = [0, 3, 6], sigma = [1, 1, 1], rate = [2/4, 1/4, 1/4])   # GMMのサンプリング
     # 3. 標本列のヒストグラム
     fig = plt.figure()
     ax = fig.add_subplot(111)
