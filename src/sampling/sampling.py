@@ -57,16 +57,18 @@ def metropolis_hastings(p):
         else: # 拒否
             sample_list.append(sample_list[i])  # 1つ前の標本を保持
 
-def sample_mixed_gauss(p):
+def sample_mixed_gauss(mu, sigma, rate):
     '''
     '''
-    rate = 3/4
-    for i in range(100000):
-        u = np.random.rand()
-        if u < rate:
-            sample_list.append(np.random.normal(0, 1))
-        else:
-            sample_list.append(np.random.normal(3, 1))
+    if sum(rate) != 1:
+        raise Exception('混合率の和が1でありません.')
+    else:
+        for i in range(100000):
+            u = np.random.rand()
+            if u < rate[0]:
+                sample_list.append(np.random.normal(mu[0], sigma[0]))
+            else:
+                sample_list.append(np.random.normal(mu[1], sigma[1]))
 
 
 def main():
@@ -81,7 +83,8 @@ def main():
                                         (gauss.gauss(theta, mu=3, sigma=1), 2/4))   # 単変量混合ガウス分布
     # 2. 標本列の生成
     #metropolis(p)   # メトロポリス法
-    metropolis_hastings(p)   # メトロポリス・ヘイスティングス法
+    #metropolis_hastings(p)   # メトロポリス・ヘイスティングス法
+    sample_mixed_gauss(p)
     # 3. 標本列のヒストグラム
     fig = plt.figure()
     ax = fig.add_subplot(111)
