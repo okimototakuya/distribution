@@ -41,7 +41,7 @@ def multidim_gauss(x, mu, sigma):
     Parameters
     -----
     x: 確率変数値 (int, numpy.ndarray, numpy.matrix)
-    mu: 期待値ベクトル (numpy.matrix配列の転置)
+    mu: 期待値1次元ベクトル (numpy.matrix配列の転置)
     sigma: 共分散分散行列 (numpy.matrix行列)            # 1変量分布の場合、標準偏差でなく分散を与えること.
 
     Returns
@@ -55,7 +55,8 @@ def multidim_gauss(x, mu, sigma):
     -----
     - [参考]: https://qiita.com/g-k/items/698c7f9e4a213d73197b
     '''
-    d = x.T.ndim
+    # 期待値1次元ベクトルから、分布の次元を決定
+    d = len(mu.T)
     #分散共分散行列の行列式
     det = np.linalg.det(sigma)
     #分散共分散行列の逆行列

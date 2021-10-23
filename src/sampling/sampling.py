@@ -97,17 +97,21 @@ def main():
     #mu = 0                                                                         # 単変量ガウス分布
     #sigma = 1
     #p = lambda theta: gauss.gauss(theta, mu=mu, sigma=sigma)       # theta : intまたはnp.ndarray
-    p = lambda theta: gauss.mixed_gauss(theta,  \
-                                        (gauss.gauss(theta, mu=0, sigma=1), 1/4),   \
-                                        (gauss.gauss(theta, mu=5, sigma=1), 1/4),   \
-                                        (gauss.gauss(theta, mu=3, sigma=1), 2/4))   # 単変量混合ガウス分布
+    p = lambda theta: gauss.multidim_gauss(theta,   \
+                                            mu = np.matrix([0]).T,  \
+                                            sigma = np.matrix([1]), \
+                                          )
+    #p = lambda theta: gauss.mixed_gauss(theta,  \
+    #                                    (gauss.gauss(theta, mu=0, sigma=1), 1/4),   \
+    #                                    (gauss.gauss(theta, mu=5, sigma=1), 1/4),   \
+    #                                    (gauss.gauss(theta, mu=3, sigma=1), 2/4))   # 単変量混合ガウス分布
     # 2. 標本列の生成
-    #metropolis(p)                                          # メトロポリス法
+    metropolis(p)                                          # メトロポリス法
     #metropolis_hastings(p)                                 # メトロポリス・ヘイスティングス法
-    sample_mixed_gauss(mu = [0, 3, 6, 9, 12],               # GMMのサンプリング
-                       sigma = [1, 1, 1, 1, 1],
-                       rate = [1/6, 1/6, 2/6, 1/6, 1/6],
-                      )
+    #sample_mixed_gauss(mu = [0, 3, 6, 9, 12],               # GMMのサンプリング
+    #                   sigma = [1, 1, 1, 1, 1],
+    #                   rate = [1/6, 1/6, 2/6, 1/6, 1/6],
+    #                  )
     # 3. 標本列のヒストグラム
     fig = plt.figure()
     ax = fig.add_subplot(111)

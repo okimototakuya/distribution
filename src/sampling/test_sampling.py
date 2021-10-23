@@ -1,5 +1,6 @@
 import sys
 import unittest
+import numpy as np
 import sampling
 sys.path.append('../distribution')
 import gauss
@@ -71,7 +72,7 @@ class TestSampling(unittest.TestCase):
                                            )
         self.assertAlmostEqual(sampling.metropolis(p), sampling.sample_mixed_gauss(mu, sigma, rate))
 
-    def test_sample_mixed_gauss_given_list_who_has_multi_elements(self):
+    def _test_sample_mixed_gauss_given_list_who_has_multi_elements(self):
         '''
         関数sampling.sample_mixed_gaussと関数sampling.metropolisによるサンプリング結果が概ね一致するかテスト.
 
@@ -91,6 +92,24 @@ class TestSampling(unittest.TestCase):
                                             (gauss.gauss(theta, mu=mu[3], sigma=sigma[3]), rate[3]),   # 単変量混合ガウス分布
                                            )
         self.assertAlmostEqual(sampling.metropolis(p), sampling.sample_mixed_gauss(mu, sigma, rate))
+
+    def test_metropolis(self):
+        '''
+        sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
+        '''
+        p = lambda theta: gauss.gauss(theta,    \
+                                      mu = 0,   \
+                                      sigma = 1,  \
+                                     )
+        p_multidim = lambda theta: gauss.multidim_gauss(theta.T,   \
+                                               mu = np.matrix([0]).T,    \
+                                               sigma = np.matrix([1]),  \
+                                              )
+        #p_multidim = lambda theta: gauss.multidim_gauss(theta,   \
+        #                                       mu = 0,    \
+        #                                       sigma = 1,  \
+        #                                      )
+        self.assertAlmostEqual(sampling.metropolis(p), sampling.metropolis(p_multidim))
 
 
 if __name__ == '__main__':
