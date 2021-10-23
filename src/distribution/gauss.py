@@ -61,7 +61,7 @@ def multidim_gauss(x, mu, sigma):
     det = np.linalg.det(sigma)
     #分散共分散行列の逆行列
     inv = np.linalg.inv(sigma)      # np.matrix型
-    matrix_z = np.exp(-(x - mu).T@inv@(x - mu)/2.0)    \
+    matrix_z = (np.exp(-((x - mu).T@inv@(x - mu))/2.0))    \
                / (np.sqrt((2*np.pi)**d * det))     # 引数をnp.matrix型で与えた場合, 返り値もnp.matrix型.
     return np.diag(matrix_z)     # 対角成分の抽出. → 2021/10/6: ToDo: 何故これでプロットできるようになったのか不明.
 

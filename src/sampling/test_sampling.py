@@ -93,23 +93,33 @@ class TestSampling(unittest.TestCase):
                                            )
         self.assertAlmostEqual(sampling.metropolis(p), sampling.sample_mixed_gauss(mu, sigma, rate))
 
-    def test_metropolis(self):
+    def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''
         sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
+        ただし、多変量の密度関数について、単変量のパラメータを与えた.
         '''
+        # 単変量ガウス
         p = lambda theta: gauss.gauss(theta,    \
                                       mu = 0,   \
                                       sigma = 1,  \
                                      )
-        p_multidim = lambda theta: gauss.multidim_gauss(theta.T,   \
+        # 多変量ガウス(に、単変量のパラメータを与える)
+        p_multidim = lambda theta: gauss.multidim_gauss(theta,   \
                                                mu = np.matrix([0]).T,    \
                                                sigma = np.matrix([1]),  \
                                               )
-        #p_multidim = lambda theta: gauss.multidim_gauss(theta,   \
-        #                                       mu = 0,    \
-        #                                       sigma = 1,  \
-        #                                      )
         self.assertAlmostEqual(sampling.metropolis(p), sampling.metropolis(p_multidim))
+
+    def test_metropolis_given_multidim_density_function_whose_parameter_is_multi(self):
+        '''
+        sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
+        '''
+        # 多変量ガウス
+        p_multidim = lambda theta: gauss.multidim_gauss(theta,   \
+                                               mu = np.matrix([0, 0]).T,    \
+                                               sigma = np.matrix([1, 0], [0, 1]),  \
+                                              )
+        self.assertAlmostEqual(sampling.metropolis(p_multidim), sampling.metropolis_hastings(p_multidim))
 
 
 if __name__ == '__main__':

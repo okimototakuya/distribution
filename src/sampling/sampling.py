@@ -94,13 +94,11 @@ def sample_mixed_gauss(mu, sigma, rate):
 def main():
     #config_ = config.Conf()     # オブジェクトを生成 (↓ヒストグラムのプロットまでの処理は全てコメントアウト.)
     # 1. 所望の分布
-    #mu = 0                                                                         # 単変量ガウス分布
-    #sigma = 1
-    #p = lambda theta: gauss.gauss(theta, mu=mu, sigma=sigma)       # theta : intまたはnp.ndarray
+    #p = lambda theta: gauss.gauss(theta, mu=0, sigma=1)       # 単変量ガウス分布
     p = lambda theta: gauss.multidim_gauss(theta,   \
                                             mu = np.matrix([0]).T,  \
                                             sigma = np.matrix([1]), \
-                                          )
+                                          )                                         # 多変量ガウス分布
     #p = lambda theta: gauss.mixed_gauss(theta,  \
     #                                    (gauss.gauss(theta, mu=0, sigma=1), 1/4),   \
     #                                    (gauss.gauss(theta, mu=5, sigma=1), 1/4),   \
