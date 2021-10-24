@@ -20,12 +20,13 @@ class TestMultidimGauss(unittest.TestCase):
     def setUp(self):
         self.__sample_size = 100
         #self.x = np.linspace(-3, 3, self.sample_size)       # x軸がシーケンス (例.プロット)
-        self.x = 0                                         # x軸がスカラー (例.サンプリング)
+        #self.x = 0                                         # x軸がスカラー (例.サンプリング)
+        #self.x = np.matrix([[0, 0], [0, 1], [0, 2]])        # x軸がスカラー (例.サンプリング)
 
     def tearDown(self):
         pass
 
-    def test_multidim_gauss_given_1_dimensional_parameter(self):
+    def _test_multidim_gauss_given_1_dimensional_parameter(self):
         '''
         gaussモジュールについて、関数multidim_gaussに1次元の引数を与えた場合に、関数gaussと関数multidim_gaussの返す値が一致するかテスト.
         '''
@@ -58,7 +59,7 @@ class TestMultidimGauss(unittest.TestCase):
         #np.testing.assert_array_almost_equal(np.array([1, 2, 3]), np.array([1, 2, 3]))                                             # 通る
         #np.testing.assert_array_almost_equal(np.array([i for i in range(100)]), np.array([i for i in range(100)][:99]+[99]))       # 通る (要素の非合致率1% かつ その値の差が1. しきい値は不明.)
 
-    def test_multidim_gauss_given_x_whose_type_is_int(self):
+    def _test_multidim_gauss_given_x_whose_type_is_int(self):
         '''
         gaussモジュールについて、関数multidim_gaussに1次元のx軸(int)を与えた場合に、関数gaussと関数multidim_gaussの返す値が一致するかテスト.
 
@@ -68,12 +69,17 @@ class TestMultidimGauss(unittest.TestCase):
         '''
         np.testing.assert_array_equal(gauss.gauss(self.x, 0, 1), gauss.multidim_gauss(self.x, mu=np.matrix([0]).T, sigma=np.matrix([1])))
 
-    def test_multidim_gauss_return_type_given_1_dimensional_parameter(self):
+    def _test_multidim_gauss_return_type_given_1_dimensional_parameter(self):
         '''
         gaussモジュールについて、関数multidim_gaussの返り値の型をテスト.
         ただし、multidim_gaussに与えるパラメータは1次元.
         '''
+        #self.x = 0                              # 通る (x軸の中の1点)
+        #self.x = [0, 1, 2]                      # 通らない (list型はTがサポートされていないため)
+        #self.x = np.matrix([0, 1, 2])           # 通らない (なんかValueError)
+        self.x = np.matrix([[0], [1], [2]])      # 通る (x軸の中の複数点. 書き方としては(多分)転置と同じこと.)
         ret_val = gauss.multidim_gauss(self.x, mu=np.matrix([0]).T, sigma=np.matrix([1]))
+        print(ret_val[2])                       # 値的にも妥当
         self.assertIsInstance(ret_val[0], float)
 
     def test_multidim_gauss_return_type_given_2_dimensional_parameter(self):
@@ -81,7 +87,11 @@ class TestMultidimGauss(unittest.TestCase):
         gaussモジュールについて、関数multidim_gaussの返り値の型をテスト.
         ただし、multidim_gaussに与えるパラメータは2次元.
         '''
+        #self.x = 0                                       # (一応) 通る(けど、何のことか分からん. ↓値的には妥当)
+        #self.x = np.matrix([0, 0])                       # 通る (x軸の中の1点)
+        self.x = np.matrix([[0, 0], [0, 1], [0, 2]])      # 通る (x軸の中の複数点)
         ret_val = gauss.multidim_gauss(self.x, mu=np.matrix([0, 0]).T, sigma=np.matrix([[1, 0], [0, 1]]))
+        print(ret_val[2])                               # 値的にも妥当
         self.assertIsInstance(ret_val[0], float)
 
 

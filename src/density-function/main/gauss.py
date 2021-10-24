@@ -40,7 +40,7 @@ def multidim_gauss(x, mu, sigma):
 
     Parameters
     -----
-    x: 確率変数値 (int, numpy.ndarray, numpy.matrix)
+    x: 確率変数値 (int, numpy.matrix)
     mu: 期待値1次元ベクトル (numpy.matrix配列の転置)
     sigma: 共分散分散行列 (numpy.matrix行列)            # 1変量分布の場合、標準偏差でなく分散を与えること.
 
@@ -55,6 +55,9 @@ def multidim_gauss(x, mu, sigma):
     -----
     - [参考]: https://qiita.com/g-k/items/698c7f9e4a213d73197b
     '''
+    # xがスカラー (int もしくは float) の場合: xそのまま. スカラーの転置はサポートされていないため.
+    # xがベクトル (np.matrix) の場合: x.T (xの転置). 密度関数の計算に合わせるため.
+    x = x if type(x) == (int or float) else x.T
     # 期待値1次元ベクトルから、分布の次元を決定
     d = len(mu.T)
     #分散共分散行列の行列式
