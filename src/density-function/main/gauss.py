@@ -63,7 +63,9 @@ def multidim_gauss(x, mu, sigma):
     inv = np.linalg.inv(sigma)      # np.matrix型
     matrix_z = (np.exp(-((x - mu).T@inv@(x - mu))/2.0))    \
                / (np.sqrt((2*np.pi)**d * det))     # 引数をnp.matrix型で与えた場合, 返り値もnp.matrix型.
-    return np.diag(matrix_z)     # 対角成分の抽出. → 2021/10/6: ToDo: 何故これでプロットできるようになったのか不明.
+    # 対角成分の抽出. → 2021/10/6: FIXME: 何故これでプロットできるようになったのか不明.
+    # 2021/10/24: FIXME: 帰り値がnp.matrixだと、サンプリングアルゴリズムに適用するときに使い物にならない.
+    return np.diag(matrix_z)
 
 def mixed_gauss(x, *input_gauss):
     '''

@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../distribution')
+sys.path.append('../density-function/main')
 import gauss
 import sampling
 

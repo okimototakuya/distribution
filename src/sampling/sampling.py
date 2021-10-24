@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import config
-sys.path.append('../distribution')
+sys.path.append('../density-function/main')
 import gauss
 
 sample_list = []

@@ -5,8 +5,10 @@ sys.path.append('../main')
 import gauss
 
 
-class TestGauss(unittest.TestCase):
-
+class TestMultidimGauss(unittest.TestCase):
+    '''
+    gaussモジュールについて、関数multidim_gaussをテスト
+    '''
     @property
     def sample_size(self, input_sample_size):
         self.__sample_size = input_sample_size
@@ -22,59 +24,6 @@ class TestGauss(unittest.TestCase):
 
     def tearDown(self):
         pass
-
-    def _test_gauss_mixedgauss_parameter(self):
-        '''
-        gaussモジュールについて、関数mixed_gaussの引数をx (np.ndarray) とinput_gauss (np.ndarray) の2つに変更し、
-        正しく動作 (np.ndarray型を返すかどうか) を確認.
-        '''
-        mixed_gauss_y = gauss.mixed_gauss(self.x, gauss.gauss(self.x, 0, 1))
-        self.assertIsInstance(mixed_gauss_y, np.ndarray)  # numpy.ndarray配列型かアサーション
-
-    def _test_mixed_gauss_given_1_standard_gauss(self):
-        '''
-        関数mixed_gaussについて、関数gaussと関数mixed_gaussの出力 (np.ndarray型) が一致するか確認.
-        ただし、関数mixed_gaussが受け取る引数は、xと1つの標準正規分布のみ。
-        '''
-        gauss_y = gauss.gauss(self.x, 0, 1)
-        mixed_gauss_y = gauss.mixed_gauss(self.x, gauss_y)
-        np.testing.assert_array_equal(gauss_y, mixed_gauss_y)   # 通る.
-
-    def _test_mixed_gauss_given_2_standard_gauss(self):
-        '''
-        関数mixed_gaussについて、関数gaussの出力の2倍と関数mixed_gaussの出力 (np.ndarray型) が一致するか確認.
-        ただし、関数mixed_gaussが受け取る引数は、xと2つの標準正規分布のみ。
-        '''
-        gauss_y = gauss.gauss(self.x, 0, 1)
-        mixed_gauss_y = gauss.mixed_gauss(self.x, gauss_y, gauss_y)
-        np.testing.assert_array_equal(gauss_y*2, mixed_gauss_y)   # 通る.
-
-    def _test_mixed_gauss_given_2_standard_gauss_who_has_mixture_ratio(self):
-        '''
-        関数mixed_gaussについて、関数gaussの出力と関数mixed_gaussの出力 (np.ndarray型) が一致するか確認.
-        ただし、関数mixed_gaussが受け取る引数は、xと2つの混合率を持つ標準正規分布のみ。
-        '''
-        gauss_y = gauss.gauss(self.x, 0, 1)
-        mixed_gauss_y = gauss.mixed_gauss(self.x, (gauss_y, 1/2), (gauss_y, 1/2))
-        np.testing.assert_array_equal(gauss_y, mixed_gauss_y)   # 通る.
-
-    def _test_mixed_gauss_given_2_standard_multidim_gauss_who_has_mixture_ratio(self):
-        '''
-        関数mixed_gaussについて、関数multidim_gaussの出力と関数mixed_gaussの出力 (np.ndarray型) が一致するか確認.
-        ただし、関数mixed_gaussが受け取る引数は、xと2つの混合率を持つ単変量標準正規分布のみ。
-        '''
-        gauss_y = gauss.multidim_gauss(self.x.T, np.matrix([0]).T, np.matrix([1]))
-        mixed_gauss_y = gauss.mixed_gauss(self.x, (gauss_y, 1/2), (gauss_y, 1/2))
-        np.testing.assert_array_equal(gauss_y, mixed_gauss_y)   # 通る.
-
-    def _test_mixed_gauss_given_2_standard_multidim_gauss_who_has_mixture_ratio(self):
-        '''
-        関数mixed_gaussについて、関数multidim_gaussの出力と関数mixed_gaussの出力 (np.ndarray型) が一致するか確認.
-        ただし、関数mixed_gaussが受け取る引数は、xと2つの混合率を持つ多変量標準正規分布のみ。
-        '''
-        gauss_y = gauss.multidim_gauss(self.x.T, np.matrix([0,0]).T, np.matrix([[1,0],[0,1]]))
-        mixed_gauss_y = gauss.mixed_gauss(self.x, (gauss_y, 1/2), (gauss_y, 1/2))
-        np.testing.assert_array_equal(gauss_y, mixed_gauss_y)   # 通る.
 
     def test_multidim_gauss_given_1_dimensional_parameter(self):
         '''
@@ -118,6 +67,22 @@ class TestGauss(unittest.TestCase):
         - 応用例: sampling.py (サンプリングアルゴリズム) で密度関数扱いする時など
         '''
         np.testing.assert_array_equal(gauss.gauss(self.x, 0, 1), gauss.multidim_gauss(self.x, mu=np.matrix([0]).T, sigma=np.matrix([1])))
+
+    def test_multidim_gauss_return_type_given_1_dimensional_parameter(self):
+        '''
+        gaussモジュールについて、関数multidim_gaussの返り値の型をテスト.
+        ただし、multidim_gaussに与えるパラメータは1次元.
+        '''
+        ret_val = gauss.multidim_gauss(self.x, mu=np.matrix([0]).T, sigma=np.matrix([1]))
+        self.assertIsInstance(ret_val[0], float)
+
+    def test_multidim_gauss_return_type_given_2_dimensional_parameter(self):
+        '''
+        gaussモジュールについて、関数multidim_gaussの返り値の型をテスト.
+        ただし、multidim_gaussに与えるパラメータは2次元.
+        '''
+        ret_val = gauss.multidim_gauss(self.x, mu=np.matrix([0, 0]).T, sigma=np.matrix([[1, 0], [0, 1]]))
+        self.assertIsInstance(ret_val[0], float)
 
 
 if __name__ == '__main__':
