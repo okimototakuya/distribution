@@ -99,6 +99,7 @@ def sample_mixed_gauss(mu, sigma, rate):
     -----
     - 単峰ガウス分布を混合率と一様分布乱数で制御することにより、混合ガウス分布をサンプリングする.
     '''
+    dim = 'solo' if type(mu[0]) == int else 'multi'     # dimについて、'solo':1次元, 'multi':多次元
     if round(sum(rate)) != 1:
         raise Exception('混合率の和が1でありません.')
     else:
@@ -111,42 +112,13 @@ def sample_mixed_gauss(mu, sigma, rate):
                 # if [sum_ < u < rate[i]+sum_ for i in range(len(rate))].any():
                 # 注1. anyは標準リストではサポートなし。 また、内包表記ではすべての要素を見るため効率が悪い。適当なインデックスをif文に検知させるのも難しそう。
                 # 注2. 逆に、for文による内包表記の中にif文を組み込むのは、よくあるやり方。
-                    sample_list.append(np.random.normal(mu[i], sigma[i]))
+                    if dim == 'solo':
+                        sample_list.append(np.random.normal(mu[i], sigma[i]))
+                    elif dim == 'multi':
+                        sample_list.append(np.random.multivariate_normal(mu[i], sigma[i], 1).tolist()[0])
                     break
                 sum_ += rate[i]
 
-def sample_multidim_mixed_gauss(mu, sigma, rate):
-    '''
-    多変量GMMのサンプリング
-
-    Parameters
-    -----
-    - mu: list
-        期待値
-    - sigma: list
-        分散/標準偏差
-    - rate: list
-        混合率
-
-    Notes
-    -----
-    - 単峰ガウス分布を混合率と一様分布乱数で制御することにより、混合ガウス分布をサンプリングする.
-    '''
-    if round(sum(rate)) != 1:
-        raise Exception('混合率の和が1でありません.')
-    else:
-        for i in range(sample_size):
-            u = np.random.rand()
-            sum_ = 0
-            for i in range(len(rate)):
-                if sum_ < u < rate[i]+sum_:
-                # 2021.10.16: Notice: ↑内包表記で書こうと試みたが...
-                # if [sum_ < u < rate[i]+sum_ for i in range(len(rate))].any():
-                # 注1. anyは標準リストではサポートなし。 また、内包表記ではすべての要素を見るため効率が悪い。適当なインデックスをif文に検知させるのも難しそう。
-                # 注2. 逆に、for文による内包表記の中にif文を組み込むのは、よくあるやり方。
-                    sample_list.append(np.random.multivariate_normal(mu[i], sigma[i], 1).tolist()[0])
-                    break
-                sum_ += rate[i]
 
 
 def main():
@@ -165,20 +137,26 @@ def main():
     #metropolis(p)                                          # メトロポリス法
     #multidim_metropolis(p)                                  # 多変量メトロポリス法
     #metropolis_hastings(p)                                 # メトロポリス・ヘイスティングス法
-    #sample_mixed_gauss(mu = [0, 3, 6, 9, 12],               # GMMのサンプリング
-    #                   sigma = [1, 1, 1, 1, 1],
-    #                   rate = [1/6, 1/6, 2/6, 1/6, 1/6],
+    #sig = [[1, 0], [0, 1]]                                  # GMMのサンプリング1
+    sig = [[1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1],] # GMMのサンプリング1
+    sample_mixed_gauss(mu = [[0, 0, 0, 0, 0, 0], [5, 5, 5, 5, 5, 5]],
+                       sigma = [sig, sig],
+                       rate = [1/2, 1/2],
+                      )
+    #sample_mixed_gauss(mu = [0, 5],                         # GMMのサンプリング2
+    #                   sigma = [1, 1],
+    #                   rate = [1/2, 1/2],
     #                  )
     #sig = [[1, 0], [0, 1]]                                  # 多変量GMMのサンプリング1
     #sample_multidim_mixed_gauss(mu = [[0, 0], [3, 3], [6, 6], [9, 9], [12, 12]],
     #                            sigma = [sig, sig, sig, sig, sig],
     #                            rate = [1/6, 1/6, 2/6, 1/6, 1/6],
     #                           )
-    sig = [[1, 0], [0, 1]]                                  # 多変量GMMのサンプリング2
-    sample_multidim_mixed_gauss(mu = [[0, 0], [3, 3]],
-                                sigma = [sig, sig],
-                                rate = [1/2, 1/2],
-                               )
+    #sig = [[1, 0], [0, 1]]                                  # 多変量GMMのサンプリング2
+    #sample_multidim_mixed_gauss(mu = [[0, 0], [3, 3]],
+    #                            sigma = [sig, sig],
+    #                            rate = [1/2, 1/2],
+    #                           )
     print(sample_list[-10:])
     ## 3. 標本列のヒストグラム
     fig = plt.figure()

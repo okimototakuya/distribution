@@ -92,6 +92,28 @@ class TestSampling(unittest.TestCase):
                                            )
         self.assertAlmostEqual(sampling.metropolis(p), sampling.sample_mixed_gauss(mu, sigma, rate))
 
+    def test_sample_mixed_gauss_given_list_who_has_multi_multidim_elements(self):
+        '''
+        関数sampling.sample_mixed_gaussと関数sampling.metropolisによるサンプリング結果が概ね一致するかテスト.
+
+        Notes
+        -----
+        - パラメータはリスト型で取得
+        - 単峰ガウス分布の混合は、任意数対応
+        - 混合率の和が1でないとき、例外を発生 (実際に例外を発生させてテスト済
+        '''
+        mu = [0, 3, 6, 9]
+        sigma = [1, 1, 1, 1]
+        rate = [1/5, 2/5, 1/5, 1/5]
+        dim = 'solo'
+        p = lambda theta: gauss.mixed_gauss(theta,  \
+                                            (gauss.gauss(theta, mu=mu[0], sigma=sigma[0]), rate[0]),   \
+                                            (gauss.gauss(theta, mu=mu[1], sigma=sigma[1]), rate[1]),   \
+                                            (gauss.gauss(theta, mu=mu[2], sigma=sigma[2]), rate[2]),   \
+                                            (gauss.gauss(theta, mu=mu[3], sigma=sigma[3]), rate[3]),   # 単変量混合ガウス分布
+                                           )
+        self.assertAlmostEqual(sampling.metropolis(p), sampling.sample_mixed_gauss(mu, sigma, rate, dim))
+
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''
         sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
@@ -111,7 +133,7 @@ class TestSampling(unittest.TestCase):
         # 2021.10.24: FIXME: アサーションの仕方を考える必要がある.
         self.assertAlmostEqual(test_list_by_np, sampling.sample_list)
 
-    def test_metropolis_given_multidim_density_function_whose_parameter_is_2dim(self):
+    def _test_metropolis_given_multidim_density_function_whose_parameter_is_2dim(self):
         '''
         sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
         ただし、多変量の密度関数について、2変量のパラメータを与えた.
