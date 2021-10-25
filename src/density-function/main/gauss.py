@@ -57,7 +57,7 @@ def multidim_gauss(x, mu, sigma):
     '''
     # xがスカラー (int もしくは float) の場合: xそのまま. スカラーの転置はサポートされていないため.
     # xがベクトル (np.matrix) の場合: x.T (xの転置). 密度関数の計算に合わせるため.
-    x = x if type(x) == (int or float) else x.T
+    x = x if type(x) == int or type(x) == float else x.T
     # 期待値1次元ベクトルから、分布の次元を決定
     d = len(mu.T)
     #分散共分散行列の行列式

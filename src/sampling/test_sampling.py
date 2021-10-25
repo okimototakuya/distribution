@@ -5,7 +5,6 @@ import sampling
 sys.path.append('../distribution')
 import gauss
 
-
 class TestSampling(unittest.TestCase):
     '''
     sampling.pyについてテスト
@@ -98,28 +97,39 @@ class TestSampling(unittest.TestCase):
         sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
         ただし、多変量の密度関数について、単変量のパラメータを与えた.
         '''
-        # 単変量ガウス
-        p = lambda theta: gauss.gauss(theta,    \
-                                      mu = 0,   \
-                                      sigma = 1,  \
-                                     )
         # 多変量ガウス(に、単変量のパラメータを与える)
         p_multidim = lambda theta: gauss.multidim_gauss(theta,   \
                                                mu = np.matrix([0]).T,    \
-                                               sigma = np.matrix([1]),  \
+                                               sigma = np.matrix([[1]]),  \
                                               )
-        self.assertAlmostEqual(sampling.metropolis(p), sampling.metropolis(p_multidim))
+        test_list_by_np = [np.random.normal() for _ in range(sampling.sample_size)]
+        sampling.metropolis(p_multidim)     # 2021.10.24: FIXME: 一度はサンプリングできたが、できなくなった.
+        print('test_list_by_np')
+        print(test_list_by_np[:10])
+        print('sampling.sample_list')
+        print(sampling.sample_list[:10])
+        # 2021.10.24: FIXME: アサーションの仕方を考える必要がある.
+        self.assertAlmostEqual(test_list_by_np, sampling.sample_list)
 
-    def test_metropolis_given_multidim_density_function_whose_parameter_is_multi(self):
+    def test_metropolis_given_multidim_density_function_whose_parameter_is_2dim(self):
         '''
         sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
+        ただし、多変量の密度関数について、2変量のパラメータを与えた.
         '''
         # 多変量ガウス
         p_multidim = lambda theta: gauss.multidim_gauss(theta,   \
                                                mu = np.matrix([0, 0]).T,    \
-                                               sigma = np.matrix([1, 0], [0, 1]),  \
+                                               sigma = np.matrix([[1, 0], [0, 1]]),  \
                                               )
-        self.assertAlmostEqual(sampling.metropolis(p_multidim), sampling.metropolis_hastings(p_multidim))
+        test_list_by_np = (np.random.multivariate_normal([0, 0], [[1, 0], [0, 1]], sampling.sample_size)).tolist()
+        sampling.multidim_metropolis(p_multidim)
+        print('test_list_by_np')
+        print(test_list_by_np[:10])
+        print('sampling.sample_list')
+        print(sampling.sample_list[:10])
+        # アサーションは通らないが、とりあえずサンプリングはできている.
+        # 2021.10.24: FIXME: アサーションの仕方を考える必要がある.
+        self.assertAlmostEqual(test_list_by_np, sampling.sample_list)
 
 
 if __name__ == '__main__':
