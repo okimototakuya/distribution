@@ -8,8 +8,8 @@ sys.path.append('../density-function/main')
 import gauss
 
 sample_list = []
-#sample_list.append(10)  # 初期値を適当に10と定めた
-sample_list.append([10, 10])  # 初期値を適当に10と定めた
+sample_list.append(10)  # 初期値を適当に10と定めた
+#sample_list.append([10, 10])  # 初期値を適当に10と定めた
 sample_size = 10000    # サンプルサイズ
 
 def metropolis(p):
@@ -45,8 +45,10 @@ def multidim_metropolis(p):
     p : function
         所望の分布
     '''
+    dim = len(sample_list[0])                                               # 分布の次元数を算出
+    sig_arp_dist = [[1 if i == j else 0 for i in range(dim)] for j in range(dim)]    # ↑上記の次元数の単位行列を定義 → 代理分布の共分散分散行列とする.
     for i in range(sample_size):
-        theta = np.random.multivariate_normal(sample_list[i], [[1, 0], [0, 1]], 1).tolist()[0] # 提案値
+        theta = np.random.multivariate_normal(sample_list[i], sig_arp_dist, 1).tolist()[0] # 提案値
         a = min(1, p(np.matrix(theta)) / p(np.matrix(sample_list[i])))
 
         u = np.random.rand() # 0 ~ 1 の一様乱数を生成
