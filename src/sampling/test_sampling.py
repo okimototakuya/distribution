@@ -92,27 +92,28 @@ class TestSampling(unittest.TestCase):
                                            )
         self.assertAlmostEqual(sampling.metropolis(p), sampling.sample_mixed_gauss(mu, sigma, rate))
 
-    def test_sample_mixed_gauss_given_list_who_has_multi_multidim_elements(self):
+    def test_sample_hmm_given_transiton_matrix_who_has_same_list_element_matches_gmm(self):
         '''
-        関数sampling.sample_mixed_gaussと関数sampling.metropolisによるサンプリング結果が概ね一致するかテスト.
+        関数sampling/sample_hmmについて、遷移行列 (GMMでの混合率) を同じリストを要素に持つ行列にした場合、
+        サンプリング結果がGMMによるものと一致するかテスト
 
         Notes
         -----
-        - パラメータはリスト型で取得
-        - 単峰ガウス分布の混合は、任意数対応
-        - 混合率の和が1でないとき、例外を発生 (実際に例外を発生させてテスト済
         '''
-        mu = [0, 3, 6, 9]
-        sigma = [1, 1, 1, 1]
-        rate = [1/5, 2/5, 1/5, 1/5]
-        dim = 'solo'
-        p = lambda theta: gauss.mixed_gauss(theta,  \
-                                            (gauss.gauss(theta, mu=mu[0], sigma=sigma[0]), rate[0]),   \
-                                            (gauss.gauss(theta, mu=mu[1], sigma=sigma[1]), rate[1]),   \
-                                            (gauss.gauss(theta, mu=mu[2], sigma=sigma[2]), rate[2]),   \
-                                            (gauss.gauss(theta, mu=mu[3], sigma=sigma[3]), rate[3]),   # 単変量混合ガウス分布
-                                           )
-        self.assertAlmostEqual(sampling.metropolis(p), sampling.sample_mixed_gauss(mu, sigma, rate, dim))
+        mu = [0, 10]
+        sigma = [1, 1]
+        list_rate = [9/10, 1/10]
+        rate_hmm = [list_rate, list_rate]
+        rate_gmm = list_rate
+        sampling.sample_list = [10]                 # HMMのサンプリング
+        sampling.sample_hmm(mu, sigma, rate_hmm)
+        print('HMMのサンプリング')
+        print(sampling.sample_list[-20:])
+        sampling.sample_list = [10]                 # GMMのサンプリング
+        sampling.sample_mixed_gauss(mu, sigma, rate_gmm)
+        print('GMMのサンプリング')
+        print(sampling.sample_list[-20:])
+        #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
 
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''

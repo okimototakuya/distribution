@@ -119,6 +119,36 @@ def sample_mixed_gauss(mu, sigma, rate):
                     break
                 sum_ += rate[i]
 
+def sample_hmm(mu, sigma, rate):
+    '''
+    HMMのサンプリング
+
+    Parameters
+    -----
+    - mu: list
+        期待値
+    - sigma: list
+        分散/標準偏差
+    - rate: list
+       遷移行列
+    '''
+    dim = 'solo' if type(mu[0]) == int or type(mu[0]) == float else 'multi'     # dimについて、'solo':1次元, 'multi':多次元
+    if False in [len(rate) == len(rate[i]) for i in range(len(rate))]:
+        raise Exception('与えられた遷移行列が正方行列でありません.')
+    elif False in [round(sum(rate[i])) == 1 for i in range(len(rate))]:
+        raise Exception('状態aからの遷移確率の和が1でありません.')
+    else:
+        for i in range(sample_size):
+            u = np.random.rand()
+            sum_ = 0
+            for i in range(len(rate)):
+                if sum_ < u < rate[0][i]+sum_:
+                    if dim == 'solo':
+                        sample_list.append(np.random.normal(mu[i], sigma[i]))
+                    elif dim == 'multi':
+                        sample_list.append(np.random.multivariate_normal(mu[i], sigma[i], 1).tolist()[0])
+                    break
+                sum_ += rate[0][i]
 
 
 def main():
