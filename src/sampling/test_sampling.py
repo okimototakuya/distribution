@@ -115,6 +115,24 @@ class TestSampling(unittest.TestCase):
         print(sampling.sample_list[-20:])
         #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
 
+    def test_sample_hmm_raise_exception(self):
+        '''
+        関数sampling/sample_hmmについて、例外を返すかテスト.
+
+        Notes
+        -----
+        - 例外発生パターン1: 与えられた遷移行列が正方行列でない.
+        - 例外発生パターン2: 遷移行列内リストの要素の和が1でない.
+        '''
+        with self.assertRaises(Exception):
+            rate_hmm = [[1/6, 2/6, 3/6], [1/5, 2/5, 2/5], [1]]  # 正方行列でない.
+            #rate_hmm = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]        # 遷移行列内リストの要素の和が1でない.
+            #rate_hmm = [[1, 1, 1], [1, 1, 1], [1]]              # 正方行列でない. かつ 遷移行列内リストの要素の和が1でない.
+            mu = [0, 10]
+            sigma = [1, 1]
+            sampling.sample_list = [10]                 # HMMのサンプリング
+            sampling.sample_hmm(mu, sigma, rate_hmm)
+
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''
         sampling.metropolis (メトロポリス法) について、多次元の分布が適用できるかテスト.
