@@ -133,7 +133,7 @@ class TestSampling(unittest.TestCase):
             sampling.sample_list = [10]                 # HMMのサンプリング
             sampling.sample_hmm(mu, sigma, rate_hmm)
 
-    def test_sample_hmm_fixed_state_by_init_state(self):
+    def _test_sample_hmm_fixed_state_by_init_state(self):
         '''
         関数sampling/sample_hmmについて、遷移行列を一般の正方行列にした場合、
         正しくサンプリングされるかテスト.
@@ -143,12 +143,32 @@ class TestSampling(unittest.TestCase):
         - ただし、初期状態を0で固定し、状態遷移はしないものとする.
         - ↑想定される挙動例1: 初期状態を0とした場合、ずっと状態0 (例.期待値0) のまま.
         - ↑想定される挙動例2: rate_hmmは事実上適用されないのと同じ. → 遷移行列が単位行列[[a11,a12],[a21,a22]] = [[1,0],[0,1]]
-        - また、仮定する状態数を2とした.
+        - また、仮定する状態数を2とする.
         '''
         # HMMで定義する各状態の分布
         mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
         sigma = [1, 1]      # パラメータ2 (")
-        rate_hmm = [[9/10, 1/10], [1/2, 1/2]]   # [＊]: このテスト関数内では遷移行列の設定は事実上意味がない. 単位行列で固定.
+        rate_hmm = [[9/10, 1/10], [1/10, 9/10]]   # [＊]: このテスト関数内では遷移行列の設定は事実上意味がない. 単位行列で固定.
+        sampling.sample_list = [10]                 # HMMのサンプリング
+        sampling.sample_hmm(mu, sigma, rate_hmm)
+        print('HMMのサンプリング')
+        print(sampling.sample_list[-20:])
+        #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
+
+    def test_sample_hmm_applied_rate_hmm(self):
+        '''
+        関数sampling/sample_hmmについて、hmm_rateを設定して正しくサンプリングされるかテスト.
+
+        Notes
+        -----
+        - ↑つまり、一般にHMMは初期状態から状態遷移をするということ.
+        - また、仮定する状態数を2とする.
+        '''
+        # HMMで定義する各状態の分布
+        mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
+        sigma = [1, 1]      # パラメータ2 (")
+        #rate_hmm = [[9/10, 1/10], [1/10, 9/10]]     # テストパターン1: ある状態aに入ったら、その状態に留まりやすい。
+        rate_hmm = [[1/10, 9/10], [9/10, 1/10]]     # テストパターン2: 状態の入れ換わりが激しい。
         sampling.sample_list = [10]                 # HMMのサンプリング
         sampling.sample_hmm(mu, sigma, rate_hmm)
         print('HMMのサンプリング')

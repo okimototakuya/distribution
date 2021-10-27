@@ -134,10 +134,26 @@ def sample_hmm(mu, sigma, rate):
 
     Notes
     -----
-    - initstate: int
+    - state: int
     　　初期状態. ただし、関数内のローカル変数として定義.
     '''
-    init_state = 0      # 初期状態
+    state = 0      # 初期状態
+    class CompareOperator():    # 状態に応じた比較演算子
+        '''
+        HMMの状態に応じて、比較演算子の挙動を替えるためのクラス.
+        '''
+        def __init__(self, state):
+            self.__state = state
+        def operator(self, operand_1, operand_2):
+            '''
+            比較演算子
+            '''
+            if self.__state == 0:
+                return operand_1 <= operand_2
+            elif self.__state == 1:
+                return operand_1 > operand_2
+            else:
+                raise Exception('一様分布乱数の設定が正しくない可能性がある.')
     dim = 'solo' if type(mu[0]) == int or type(mu[0]) == float else 'multi'     # dimについて、'solo':1次元, 'multi':多次元
     if False in [len(rate) == len(rate[i]) for i in range(len(rate))]:
         raise Exception('与えられた遷移行列が正方行列でありません.')
@@ -146,15 +162,23 @@ def sample_hmm(mu, sigma, rate):
     else:
         for i in range(sample_size):
             u = np.random.rand()
-            sum_ = [0 for i in range(len(rate))]
-            for i in range(len(rate)):
-                if sum_[init_state] < u < rate[init_state][i]+sum_[init_state]:
-                    if dim == 'solo':
-                        sample_list.append(np.random.normal(mu[init_state], sigma[init_state]))
-                    elif dim == 'multi':
-                        sample_list.append(np.random.multivariate_normal(mu[init_state], sigma[init_state], 1).tolist()[0])
-                    break
-                sum_[init_state] += rate[init_state][i]
+            compare_operator = CompareOperator(state)
+            if compare_operator.operator(u, rate[state][0]):
+                if dim == 'solo':
+                    sample_list.append(np.random.normal(mu[state], sigma[state]))
+                elif dim == 'multi':
+                    sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
+                else:
+                    raise Exception('関数内ローカル変数dimの設定が正しくありません.')
+            else:
+                # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
+                state = int(format(~state & 0x1, '01b'))    # 状態遷移
+                if dim == 'solo':
+                    sample_list.append(np.random.normal(mu[state], sigma[state]))
+                elif dim == 'multi':
+                    sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
+                else:
+                    raise Exception('関数内ローカル変数dimの設定が正しくありません.')
 
 
 def main():
