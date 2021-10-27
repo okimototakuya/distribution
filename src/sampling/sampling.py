@@ -119,7 +119,7 @@ def sample_mixed_gauss(mu, sigma, rate):
                     break
                 sum_ += rate[i]
 
-def sample_hmm(mu, sigma, rate):
+def sample_hmm(mu, sigma, rate, state):
     '''
     HMMのサンプリング
 
@@ -130,30 +130,31 @@ def sample_hmm(mu, sigma, rate):
     - sigma: list
         分散/標準偏差
     - rate: list
-       遷移行列
+        遷移行列
+    - state: int
+        状態のラベル
 
     Notes
     -----
     - state: int
     　　初期状態. ただし、関数内のローカル変数として定義.
     '''
-    state = 0      # 初期状態
+    # 1. 状態の設定
     class CompareOperator():    # 状態に応じた比較演算子
         '''
         HMMの状態に応じて、比較演算子の挙動を替えるためのクラス.
         '''
-        def __init__(self, state):
+        def __init__(self, rand, state):
+            self.__rand = rand
             self.__state = state
-        def operator(self, operand_1, operand_2):
+            if self.__state != 0 and self.__state != 1: # ただし、2状態を仮定した場合
+                raise Exception('状態の設定が正しくありません.')
+        def __pow__(self, operand):
             '''
-            比較演算子
+            比較演算子 (のオーバーライド)
             '''
-            if self.__state == 0:
-                return operand_1 <= operand_2
-            elif self.__state == 1:
-                return operand_1 > operand_2
-            else:
-                raise Exception('一様分布乱数の設定が正しくない可能性がある.')
+            return self.__rand <= operand if self.__state == 0 else self.__rand > operand
+    # 2. HMMのサンプリング
     dim = 'solo' if type(mu[0]) == int or type(mu[0]) == float else 'multi'     # dimについて、'solo':1次元, 'multi':多次元
     if False in [len(rate) == len(rate[i]) for i in range(len(rate))]:
         raise Exception('与えられた遷移行列が正方行列でありません.')
@@ -161,24 +162,18 @@ def sample_hmm(mu, sigma, rate):
         raise Exception('状態aからの遷移確率の和が1でありません.')
     else:
         for i in range(sample_size):
-            u = np.random.rand()
-            compare_operator = CompareOperator(state)
-            if compare_operator.operator(u, rate[state][0]):
-                if dim == 'solo':
-                    sample_list.append(np.random.normal(mu[state], sigma[state]))
-                elif dim == 'multi':
-                    sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
-                else:
-                    raise Exception('関数内ローカル変数dimの設定が正しくありません.')
+            random_ = CompareOperator(np.random.rand(), state)
+            # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
+            # 三項演算子について、
+            # if文  : 状態維持
+            # else文: 状態遷移
+            state = state if random_ ** rate[state][0] else int(format(~state & 0x1, '01b'))
+            if dim == 'solo':
+                sample_list.append(np.random.normal(mu[state], sigma[state]))
+            elif dim == 'multi':
+                sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
             else:
-                # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
-                state = int(format(~state & 0x1, '01b'))    # 状態遷移
-                if dim == 'solo':
-                    sample_list.append(np.random.normal(mu[state], sigma[state]))
-                elif dim == 'multi':
-                    sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
-                else:
-                    raise Exception('関数内ローカル変数dimの設定が正しくありません.')
+                raise Exception('関数内ローカル変数dimの設定が正しくありません.')
 
 
 def main():
