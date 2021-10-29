@@ -165,9 +165,9 @@ def sample_hmm(mu, sigma, rate, state):
             random_ = CompareOperator(np.random.rand(), state)
             # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
             # 三項演算子について、
-            # if文  : 状態維持
+            # if文  : 状態維持 (＊: 一番始めは初期状態を維持するため、条件にi == 0をorで追加.
             # else文: 状態遷移
-            state = state if random_ ** rate[state][0] else int(format(~state & 0x1, '01b'))
+            state = state if i == 0 or random_ ** rate[state][0] else int(format(~state & 0x1, '01b'))
             if dim == 'solo':
                 sample_list.append(np.random.normal(mu[state], sigma[state]))
             elif dim == 'multi':
@@ -192,11 +192,11 @@ def main():
     #metropolis(p)                                          # メトロポリス法
     #multidim_metropolis(p)                                  # 多変量メトロポリス法
     #metropolis_hastings(p)                                 # メトロポリス・ヘイスティングス法
-    sig = [[1 if i == j else 0 for i in range(6)] for j in range(6)]    # GMMのサンプリング1
-    sample_mixed_gauss(mu = [[0, 0, 0, 0, 0, 0], [5, 5, 5, 5, 5, 5]],
-                       sigma = [sig, sig],
-                       rate = [1/2, 1/2],
-                      )
+    #sig = [[1 if i == j else 0 for i in range(6)] for j in range(6)]    # GMMのサンプリング1
+    #sample_mixed_gauss(mu = [[0, 0, 0, 0, 0, 0], [5, 5, 5, 5, 5, 5]],
+    #                   sigma = [sig, sig],
+    #                   rate = [1/2, 1/2],
+    #                  )
     #sample_mixed_gauss(mu = [0, 5],                         # GMMのサンプリング2
     #                   sigma = [1, 1],
     #                   rate = [1/2, 1/2],
@@ -211,19 +211,24 @@ def main():
     #                            sigma = [sig, sig],
     #                            rate = [1/2, 1/2],
     #                           )
+    sample_hmm(mu = [0, 10],                                # HMMのサンプリング
+               sigma = [1, 1],
+               rate = [[9/10, 1/10], [1/10, 9/10]],
+               state = 0
+              )
     print(sample_list[-10:])
-    ## 3. 標本列のヒストグラム
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    # 1次元
-    #ax = plt.hist(sample_list, bins=100)
-    # 2次元
-    #x, y = sample_list                         # エラー
-    #x, y = np.vstack(sample_list)              # エラー
-    x, y = np.vstack(sample_list, sample_list)  # エラー
-    H = ax.hist2d(x, y, bins=[np.linspace(-30,30,61),np.linspace(-30,30,61)], cmap=cm.jet)
-    fig.colorbar(H[3],ax=ax)
-    plt.show()
+    ### 3. 標本列のヒストグラム
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111)
+    ## 1次元
+    ##ax = plt.hist(sample_list, bins=100)
+    ## 2次元
+    ##x, y = sample_list                         # エラー
+    ##x, y = np.vstack(sample_list)              # エラー
+    #x, y = np.vstack(sample_list, sample_list)  # エラー
+    #H = ax.hist2d(x, y, bins=[np.linspace(-30,30,61),np.linspace(-30,30,61)], cmap=cm.jet)
+    #fig.colorbar(H[3],ax=ax)
+    #plt.show()
 
 if __name__ == '__main__':
     main()

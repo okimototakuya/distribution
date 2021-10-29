@@ -167,14 +167,14 @@ class TestSampling(unittest.TestCase):
         # HMMで定義する各状態の分布
         mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
         sigma = [1, 1]      # パラメータ2 (")
-        #rate_hmm, state = [[9/10, 1/10], [1/10, 9/10]], 0     # テストパターン1: 初期状態が0で、ある状態aに入ったらその状態に留まりやすい。
-        rate_hmm, state = [[1/10, 9/10], [9/10, 1/10]], 0     # テストパターン2: 初期状態が0で、状態の入れ換わりが激しい。
+        rate_hmm, state = [[9/10, 1/10], [1/10, 9/10]], 0     # テストパターン1: 初期状態が0で、ある状態aに入ったらその状態に留まりやすい。
+        #rate_hmm, state = [[1/10, 9/10], [9/10, 1/10]], 0     # テストパターン2: 初期状態が0で、状態の入れ換わりが激しい。
         #rate_hmm, state = [[9/10, 1/10], [1/10, 9/10]], 1     # テストパターン3: 初期状態が1で、ある状態aに入ったらその状態に留まりやすい。
         #rate_hmm, state = [[1/10, 9/10], [9/10, 1/10]], 1     # テストパターン4: 初期状態が1で、状態の入れ換わりが激しい。
         sampling.sample_list = []                           # HMMのサンプリング
         sampling.sample_hmm(mu, sigma, rate_hmm, state)
         print('HMMのサンプリング')
-        print(sampling.sample_list[-20:])
+        print(sampling.sample_list[:20])        # 最初は初期状態が維持されることを確認するため、sample_list[:n]
         #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
 
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
