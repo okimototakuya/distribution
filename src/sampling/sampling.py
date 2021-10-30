@@ -9,7 +9,7 @@ import gauss
 
 sample_list = []
 #sample_list.append(10)  # 初期値を適当に10と定めた
-sample_list.append([10, 10])  # 初期値を適当に10と定めた
+#sample_list.append([10, 10])  # 初期値を適当に10と定めた
 sample_size = 10000    # サンプルサイズ
 
 def metropolis(p):
@@ -139,41 +139,43 @@ def sample_hmm(mu, sigma, rate, state):
     - state: int
     　　初期状態. ただし、関数内のローカル変数として定義.
     '''
-    # 1. 状態の設定
-    class CompareOperator():    # 状態に応じた比較演算子
-        '''
-        HMMの状態に応じて、比較演算子の挙動を替えるためのクラス.
-        '''
-        def __init__(self, rand, state):
-            self.__rand = rand
-            self.__state = state
-            if self.__state != 0 and self.__state != 1: # ただし、2状態を仮定した場合
-                raise Exception('状態の設定が正しくありません.')
-        def __pow__(self, operand):
-            '''
-            比較演算子 (のオーバーライド)
-            '''
-            return self.__rand <= operand if self.__state == 0 else self.__rand > operand
-    # 2. HMMのサンプリング
     dim = 'solo' if type(mu[0]) == int or type(mu[0]) == float else 'multi'     # dimについて、'solo':1次元, 'multi':多次元
+    state_list = []     # テストコード用: 状態遷移列 (状態遷移の履歴) を保存
     if False in [len(rate) == len(rate[i]) for i in range(len(rate))]:
         raise Exception('与えられた遷移行列が正方行列でありません.')
     elif False in [round(sum(rate[i])) == 1 for i in range(len(rate))]:
         raise Exception('状態aからの遷移確率の和が1でありません.')
     else:
         for i in range(sample_size):
-            random_ = CompareOperator(np.random.rand(), state)
+            #random_ = np.random.rand()  # 一様分布乱数を出力.
+            #random_ = 3/10                            # テストパターン1: 初期状態が0で、状態遷移しない。
+            random_ = 2/10 if i % 2 == 0 else 5/10    # テストパターン2: 初期状態が0で、状態0と1が交互に入れ換わる。
+            #random_ = 8/10                            # テストパターン3: 初期状態が1で、状態遷移しない。
+            #random_ = 5/10 if i % 2 == 0 else 2/10    # テストパターン4: 初期状態が1で、状態0と1が交互に入れ換わる。
             # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
             # 三項演算子について、
-            # if文  : 状態維持 (＊: 一番始めは初期状態を維持するため、条件にi == 0をorで追加.
+            # if文  : 状態維持
+            # - 一番始めは初期状態を維持するため、条件にi == 0をorで追加.
+            # - rate[state][state-1] < random_ <= rate[state][state+1] の時、状態維持.
+            # - 遷移行列のrate[0][0], rate[len(rate)-1][len(rate)-1]の時、各々場合分けして処理.→ 　各々0, 1を出力.
             # else文: 状態遷移
-            state = state if i == 0 or random_ ** rate[state][0] else int(format(~state & 0x1, '01b'))
+            # - ↑それ以外の時、状態遷移.
+            #state = state if ((i == 0) or   \  # 三項演算子について、if文内の条件が!=. ↓下記は==.
+            #                  ((rate[state][state-1] if state != 0 else 0) < random_ <=  \
+            #                        (rate[state][state+1] if state != len(rate)-1 else 1)))   \
+            #              else int(format(~state & 0x1, '01b'))
+            state = state if ((i == 0) or   \
+                              (0 if state == 0 else rate[state][state-1]) < random_ <=  \
+                                    (1 if state == len(rate)-1 else rate[state][state+1]))   \
+                          else int(format(~state & 0x1, '01b'))
+            state_list.append(state)    # テストコード用: i回目での状態を追加.
             if dim == 'solo':
                 sample_list.append(np.random.normal(mu[state], sigma[state]))
             elif dim == 'multi':
                 sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
             else:
                 raise Exception('関数内ローカル変数dimの設定が正しくありません.')
+    return state_list   # テストコード用: 状態遷移の履歴を出力.
 
 
 def main():
@@ -213,10 +215,12 @@ def main():
     #                           )
     sample_hmm(mu = [0, 10],                                # HMMのサンプリング
                sigma = [1, 1],
-               rate = [[9/10, 1/10], [1/10, 9/10]],
-               state = 0
+               rate = [[9/10, 1/10], [1/10, 9/10]],    # テストパターン1, 3に類似
+               #rate = [[1/10, 9/10], [9/10, 1/10]],    # テストパターン2, 4に類似
+               state = 1
               )
-    print(sample_list[-10:])
+    #print(sample_list[-10:])
+    print(sample_list[:10])
     ### 3. 標本列のヒストグラム
     #fig = plt.figure()
     #ax = fig.add_subplot(111)
