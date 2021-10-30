@@ -189,18 +189,30 @@ class TestSampling(unittest.TestCase):
         mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
         sigma = [1, 1]      # パラメータ2 (")
         rate_hmm = [[4/10, 6/10], [3/10, 7/10]]       # 遷移行列
-        #state =  0                                              # テストパターン1: 初期状態が0で、状態遷移しない。
-        #state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        #self.assertEqual(state_list[:40], [0 for i in range(40)])
-        state = 0                                              # [*] テストパターン2: 初期状態が0で、状態0と1が交互に入れ換わる。
+        state =  0                                              # テストパターン1: 初期状態が0で、状態遷移しない。
         state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        self.assertEqual(state_list[:40], [0 if i % 2 == 0 else 1 for i in range(40)])
+        test_list = [0 for i in range(40)]  # テスト数列
+        self.assertEqual(state_list[:40], test_list)
+        #state = 0                                              # テストパターン2: 初期状態が0で、状態0と1が交互に入れ換わる。
+        #state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
+        #test_list = [0 if i % 2 == 0 else 1 for i in range(40)]    # テスト数列
+        #print('テスト数列: テストパターン2')
+        #print(test_list)
+        #self.assertEqual(state_list[:40], test_list)
         #state =  1                                              # テストパターン3: 初期状態が1で、状態遷移しない。
         #state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        #self.assertEqual(state_list[:40], [1 for i in range(40)])
-        #state = 1                                              # [*] テストパターン4: 初期状態が1で、状態0と1が交互に入れ換わる。
+        #test_list = [1 for i in range(40)]  # テスト数列
+        #self.assertEqual(state_list[:40], test_list)
+        #print('テスト数列: テストパターン3')
+        #print(test_list)
+        #state = 1                                              # テストパターン4: 初期状態が1で、状態0と1が交互に入れ換わる。
         #state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        #self.assertEqual(state_list[:40], [1 if i % 2 == 0 else 0 for i in range(40)])
+        #test_list = [1 if i % 2 == 0 else 0 for i in range(40)] # テスト数列
+        #print('テスト数列: テストパターン4')
+        #print(test_list)
+        #self.assertEqual(state_list[:40], test_list)
+        print('state_list')
+        print(state_list[:40])
 
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''

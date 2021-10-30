@@ -148,8 +148,8 @@ def sample_hmm(mu, sigma, rate, state):
     else:
         for i in range(sample_size):
             #random_ = np.random.rand()  # 一様分布乱数を出力.
-            #random_ = 3/10                            # テストパターン1: 初期状態が0で、状態遷移しない。
-            random_ = 2/10 if i % 2 == 0 else 5/10    # テストパターン2: 初期状態が0で、状態0と1が交互に入れ換わる。
+            random_ = 3/10                            # テストパターン1: 初期状態が0で、状態遷移しない。
+            #random_ = 2/10 if i % 2 == 0 else 5/10    # テストパターン2: 初期状態が0で、状態0と1が交互に入れ換わる。
             #random_ = 8/10                            # テストパターン3: 初期状態が1で、状態遷移しない。
             #random_ = 5/10 if i % 2 == 0 else 2/10    # テストパターン4: 初期状態が1で、状態0と1が交互に入れ換わる。
             # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
@@ -165,8 +165,8 @@ def sample_hmm(mu, sigma, rate, state):
             #                        (rate[state][state+1] if state != len(rate)-1 else 1)))   \
             #              else int(format(~state & 0x1, '01b'))
             state = state if ((i == 0) or   \
-                              (0 if state == 0 else rate[state][state-1]) < random_ <=  \
-                                    (1 if state == len(rate)-1 else rate[state][state+1]))   \
+                              ((0 if state == 0 else rate[state][state]) < random_ <=  \
+                                    (1 if state == len(rate)-1 else rate[state][state])))   \
                           else int(format(~state & 0x1, '01b'))
             state_list.append(state)    # テストコード用: i回目での状態を追加.
             if dim == 'solo':
