@@ -147,11 +147,15 @@ def sample_hmm(mu, sigma, rate, state):
         raise Exception('状態aからの遷移確率の和が1でありません.')
     else:
         for i in range(sample_size):
-            random_ = np.random.rand()  # 一様分布乱数を出力.
-            #random_ = 3/10                            # テストパターン1: 初期状態が0で、状態遷移しない。
-            #random_ = 2/10 if i % 2 == 0 else 5/10    # テストパターン2: 初期状態が0で、状態0と1が交互に入れ換わる。
-            #random_ = 8/10                            # テストパターン3: 初期状態が1で、状態遷移しない。
-            #random_ = 5/10 if i % 2 == 0 else 2/10    # テストパターン4: 初期状態が1で、状態0と1が交互に入れ換わる。
+            #random_ = np.random.rand()  # 一様分布乱数を出力.
+            #random_ = 3/10                            # テストパターン1 (fixed): 初期状態が0で、状態遷移しない。
+            #random_ = 2/10 if i % 2 == 0 else 5/10    # テストパターン2 (fixed): 初期状態が0で、状態0と1が交互に入れ換わる。
+            #random_ = 8/10                            # テストパターン3 (fixed): 初期状態が1で、状態遷移しない。
+            #random_ = 5/10 if i % 2 == 0 else 2/10    # テストパターン4 (fixed): 初期状態が1で、状態0と1が交互に入れ換わる。
+            #random_ = np.random.rand() * 0.4            # テストパターン1 (limited): 初期状態が0で、状態を維持する。
+            random_ = np.random.rand() * (1.0-0.7) + 0.7 # テストパターン2 (limited): 初期状態が0で、遷移後は状態1を維持する。
+            #random_ = np.random.rand() * (1.0-0.7) + 0.7  # テストパターン3 (limited): 初期状態が1で、状態を維持する。
+            #random_ = np.random.rand() * 0.4            # テストパターン4 (limited): 初期状態が1で、遷移後は状態0を維持する。
             # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
             # 三項演算子について、
             # if文  : 状態維持

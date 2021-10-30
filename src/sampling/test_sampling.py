@@ -177,7 +177,7 @@ class TestSampling(unittest.TestCase):
         print(sampling.sample_list[:20])        # 最初は初期状態が維持されることを確認するため、sample_list[:n]
         #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
 
-    def test_sample_hmm_by_fixed_random_number(self):
+    def _test_sample_hmm_by_fixed_random_number(self):
         '''
         関数sampling/sample_hmmについて、関数内の乱数を固定して正しくサンプリングされるかテスト.
 
@@ -211,6 +211,26 @@ class TestSampling(unittest.TestCase):
         #print('テスト数列: テストパターン4')
         #print(test_list)
         #self.assertEqual(state_list[:40], test_list)
+        print('state_list')
+        print(state_list[:40])
+
+    def test_sample_hmm_by_limited_random_number(self):
+        '''
+        関数sampling/sample_hmmについて、関数内の乱数の生成範囲を制限して正しくサンプリングされるかテスト.
+
+        Notes
+        -----
+        - 仮定する状態数を2とする.
+        '''
+        # HMMで定義する各状態の分布
+        mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
+        sigma = [1, 1]      # パラメータ2 (")
+        rate_hmm = [[4/10, 6/10], [3/10, 7/10]]       # 遷移行列
+        #state = 0     # テストパターン1: 初期状態が0で、状態を維持する。
+        state = 0      # テストパターン2: 初期状態が0で、遷移後は状態1を維持する。
+        #state =  1      # テストパターン3: 初期状態が1で、状態を維持する。
+        #state = 1      # テストパターン4: 初期状態が1で、遷移後は状態0を維持する。
+        state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
         print('state_list')
         print(state_list[:40])
 
