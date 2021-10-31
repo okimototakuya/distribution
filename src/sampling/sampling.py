@@ -9,7 +9,7 @@ import gauss
 
 sample_list = []
 #sample_list.append(10)  # 初期値を適当に10と定めた
-sample_list.append([10, 10])  # 初期値を適当に10と定めた
+#sample_list.append([10, 10])  # 初期値を適当に10と定めた
 sample_size = 10000    # サンプルサイズ
 
 def metropolis(p):
@@ -119,6 +119,57 @@ def sample_mixed_gauss(mu, sigma, rate):
                     break
                 sum_ += rate[i]
 
+def sample_hmm(mu, sigma, rate, state):
+    '''
+    HMMのサンプリング
+
+    Parameters
+    -----
+    - mu: list
+        期待値
+    - sigma: list
+        分散/標準偏差
+    - rate: list
+        遷移行列
+    - state: int
+        状態のラベル
+
+    Notes
+    -----
+    - state: int
+    　　初期状態. ただし、関数内のローカル変数として定義.
+    '''
+    dim = 'solo' if type(mu[0]) == int or type(mu[0]) == float else 'multi'     # dimについて、'solo':1次元, 'multi':多次元
+    state_list = []     # テストコード用: 状態遷移列 (状態遷移の履歴) を保存
+    if False in [len(rate) == len(rate[i]) for i in range(len(rate))]:
+        raise Exception('与えられた遷移行列が正方行列でありません.')
+    elif False in [round(sum(rate[i])) == 1 for i in range(len(rate))]:
+        raise Exception('状態aからの遷移確率の和が1でありません.')
+    else:
+        for i in range(sample_size):
+            random_ = np.random.rand()     # プロダクトコード:  一様分布乱数を出力.
+            if i == 0:  # はじめは初期状態を維持
+                if dim == 'solo':
+                    sample_list.append(np.random.normal(mu[state], sigma[state]))
+                elif dim == 'multi':
+                    sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
+                else:
+                    raise Exception('関数内ローカル変数dimの設定が適切でありません。')
+            else:
+                sum_ = 0
+                for i in range(len(rate)):
+                    if sum_ < random_ < rate[state][i]+sum_:
+                        state = i   # 状態維持または遷移
+                        if dim == 'solo':
+                            sample_list.append(np.random.normal(mu[state], sigma[state]))
+                        elif dim == 'multi':
+                            sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
+                        else:
+                            raise Exception('関数内ローカル変数dimの設定が適切でありません。')
+                        break
+                    sum_ += rate[state][i]
+            state_list.append(state)    # テストコード用: i回目での状態を追加.
+    return state_list   # テストコード用: 状態遷移の履歴を出力.
 
 
 def main():
@@ -137,12 +188,11 @@ def main():
     #metropolis(p)                                          # メトロポリス法
     #multidim_metropolis(p)                                  # 多変量メトロポリス法
     #metropolis_hastings(p)                                 # メトロポリス・ヘイスティングス法
-    #sig = [[1, 0], [0, 1]]                                  # GMMのサンプリング1
-    sig = [[1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1],] # GMMのサンプリング1
-    sample_mixed_gauss(mu = [[0, 0, 0, 0, 0, 0], [5, 5, 5, 5, 5, 5]],
-                       sigma = [sig, sig],
-                       rate = [1/2, 1/2],
-                      )
+    #sig = [[1 if i == j else 0 for i in range(6)] for j in range(6)]    # GMMのサンプリング1
+    #sample_mixed_gauss(mu = [[0, 0, 0, 0, 0, 0], [5, 5, 5, 5, 5, 5]],
+    #                   sigma = [sig, sig],
+    #                   rate = [1/2, 1/2],
+    #                  )
     #sample_mixed_gauss(mu = [0, 5],                         # GMMのサンプリング2
     #                   sigma = [1, 1],
     #                   rate = [1/2, 1/2],
@@ -157,19 +207,31 @@ def main():
     #                            sigma = [sig, sig],
     #                            rate = [1/2, 1/2],
     #                           )
-    print(sample_list[-10:])
-    ## 3. 標本列のヒストグラム
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    # 1次元
-    #ax = plt.hist(sample_list, bins=100)
-    # 2次元
-    #x, y = sample_list                         # エラー
-    #x, y = np.vstack(sample_list)              # エラー
-    x, y = np.vstack(sample_list, sample_list)  # エラー
-    H = ax.hist2d(x, y, bins=[np.linspace(-30,30,61),np.linspace(-30,30,61)], cmap=cm.jet)
-    fig.colorbar(H[3],ax=ax)
-    plt.show()
+    state_list = sample_hmm(mu = [0, 10],                                # HMMのサンプリング
+               sigma = [1, 1],
+               # ↓FIXME: 2021.10.31: [実行結果]: 状態0に留まりやすく、1に留まりにくい。
+               rate = [[9/10, 1/10], [1/10, 9/10]],    # テストパターン1, 3に類似 (ある状態aに留まりやすい
+               # ↓FIXME: 2021.10.31: [実行結果]: 状態1に留まりやすく、0に留まりにくい。
+               #rate = [[1/10, 9/10], [9/10, 1/10]],    # テストパターン2, 4に類似 (状態遷移しやすい
+               state = 1
+              )
+    #print(sample_list[-10:])
+    print('乱数列')
+    print(sample_list[:40])
+    print('状態列')
+    print(state_list[:40])
+    ### 3. 標本列のヒストグラム
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111)
+    ## 1次元
+    ##ax = plt.hist(sample_list, bins=100)
+    ## 2次元
+    ##x, y = sample_list                         # エラー
+    ##x, y = np.vstack(sample_list)              # エラー
+    #x, y = np.vstack(sample_list, sample_list)  # エラー
+    #H = ax.hist2d(x, y, bins=[np.linspace(-30,30,61),np.linspace(-30,30,61)], cmap=cm.jet)
+    #fig.colorbar(H[3],ax=ax)
+    #plt.show()
 
 if __name__ == '__main__':
     main()
