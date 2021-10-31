@@ -148,25 +148,13 @@ def sample_hmm(mu, sigma, rate, state):
     else:
         for i in range(sample_size):
             random_ = np.random.rand()     # プロダクトコード:  一様分布乱数を出力.
-            # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
-            # 三項演算子について、
-            # if文  : 状態維持
-            # - 一番始めは初期状態を維持するため、条件にi == 0をorで追加.
-            # else文: 状態遷移
-            # - ↑それ以外の時、状態遷移.
-            if ((i == 0) or (0 <= random_ <= rate[state][state])):  # 状態維持
+            if i == 0:  # はじめは初期状態を維持
                 pass
-            else:   # 状態遷移
+            else:
                 sum_ = 0
                 for i in range(len(rate)):
-                    if sum_ < random_ < rate[state][i]+sum_ and state != i:
-                    # 2021.10.16: Notice: ↑内包表記で書こうと試みたが...
-                    # if [sum_ < u < rate[i]+sum_ for i in range(len(rate))].any():
-                    # 注1. anyは標準リストではサポートなし。
-                    # また、内包表記ではすべての要素を見るため効率が悪い。
-                    # 適当なインデックスをif文に検知させるのも難しそう。
-                    # 注2. 逆に、for文による内包表記の中にif文を組み込むのは、よくあるやり方。
-                        state = i
+                    if sum_ < random_ < rate[state][i]+sum_:
+                        state = i   # 状態維持または遷移
                         break
                     sum_ += rate[state][i]
             state_list.append(state)    # テストコード用: i回目での状態を追加.
