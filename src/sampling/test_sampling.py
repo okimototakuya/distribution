@@ -162,15 +162,20 @@ class TestSampling(unittest.TestCase):
         '''
         関数sampling/sample_hmmについて、3状態を仮定して正しくサンプリングされるかテスト.
         '''
-        mu = [0, 10, 20]        # パラメータ1 (リスト内の要素について、各々状態0, 1, 2)
-        sigma = [1, 1, 1]      # パラメータ2 (")
-        rate_hmm, state = [[8/10, 1/10, 1/10], [1/10, 8/10, 1/10], [1/10, 1/10, 8/10]], 0   # 初期状態が0で、維持しやすい。
-        #rate_hmm, state = [[1/10, 7/10, 2/10], [5/10, 1/10, 4/10], [3/10, 6/10, 1/10]], 0   # 初期状態が0で、遷移しやすい。やや、状態2に遷移しやすい。
+        #mu = [0, 10, 20]        # パラメータ1 (1次元)
+        mu = [[0, 0, 0, 0, 0, 0],   # パラメータ1 (6次元)
+                [10, 10, 10, 10, 10, 10],
+                [20, 20, 20, 20, 20, 20]]
+        #sigma = [1, 1, 1]      # パラメータ2 (1次元)
+        sig = [[1 if i==j else 0 for j in range(6)] for i in range(6)]
+        sigma = [sig, sig, sig]    # パラメータ2 (6次元)
+        #rate_hmm, state = [[8/10, 1/10, 1/10], [1/10, 8/10, 1/10], [1/10, 1/10, 8/10]], 0   # 初期状態が0で、維持しやすい。
+        rate_hmm, state = [[1/10, 7/10, 2/10], [5/10, 1/10, 4/10], [3/10, 6/10, 1/10]], 0   # 初期状態が0で、遷移しやすい。やや、状態2に遷移しやすい。
         state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
         print('乱数列')
-        print(sampling.sample_list[:40])        # 最初は初期状態が維持されることを確認するため、sample_list[:n]
+        print(sampling.sample_list[:20])        # 最初は初期状態が維持されることを確認するため、sample_list[:n]
         print('状態列')
-        print(state_list[:40])
+        print(state_list[:20])
 
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''
