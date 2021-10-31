@@ -149,12 +149,23 @@ def sample_hmm(mu, sigma, rate, state):
         for i in range(sample_size):
             random_ = np.random.rand()     # プロダクトコード:  一様分布乱数を出力.
             if i == 0:  # はじめは初期状態を維持
-                pass
+                if dim == 'solo':
+                    sample_list.append(np.random.normal(mu[state], sigma[state]))
+                elif dim == 'multi':
+                    sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
+                else:
+                    raise Exception('関数内ローカル変数dimの設定が適切でありません。')
             else:
                 sum_ = 0
                 for i in range(len(rate)):
                     if sum_ < random_ < rate[state][i]+sum_:
                         state = i   # 状態維持または遷移
+                        if dim == 'solo':
+                            sample_list.append(np.random.normal(mu[state], sigma[state]))
+                        elif dim == 'multi':
+                            sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
+                        else:
+                            raise Exception('関数内ローカル変数dimの設定が適切でありません。')
                         break
                     sum_ += rate[state][i]
             state_list.append(state)    # テストコード用: i回目での状態を追加.

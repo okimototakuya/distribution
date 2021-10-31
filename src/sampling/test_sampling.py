@@ -105,11 +105,12 @@ class TestSampling(unittest.TestCase):
         list_rate = [9/10, 1/10]
         rate_hmm = [list_rate, list_rate]
         rate_gmm = list_rate
-        sampling.sample_list = [10]                 # HMMのサンプリング
-        sampling.sample_hmm(mu, sigma, rate_hmm)
+        state = 0
+        sampling.sample_list = []                 # HMMのサンプリング
+        sampling.sample_hmm(mu, sigma, rate_hmm, state)
         print('HMMのサンプリング')
         print(sampling.sample_list[-20:])
-        sampling.sample_list = [10]                 # GMMのサンプリング
+        sampling.sample_list = []                 # GMMのサンプリング
         sampling.sample_mixed_gauss(mu, sigma, rate_gmm)
         print('GMMのサンプリング')
         print(sampling.sample_list[-20:])
@@ -133,7 +134,7 @@ class TestSampling(unittest.TestCase):
             sampling.sample_list = [10]                 # HMMのサンプリング
             sampling.sample_hmm(mu, sigma, rate_hmm)
 
-    def test_sample_hmm_applied_rate_hmm(self):
+    def _test_sample_hmm_applied_rate_hmm(self):
         '''
         関数sampling/sample_hmmについて、hmm_rateを設定して正しくサンプリングされるかテスト.
 
@@ -156,6 +157,20 @@ class TestSampling(unittest.TestCase):
         print('状態列')
         print(state_list[:40])
         #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
+
+    def test_sample_hmm_assumed_3_state(self):
+        '''
+        関数sampling/sample_hmmについて、3状態を仮定して正しくサンプリングされるかテスト.
+        '''
+        mu = [0, 10, 20]        # パラメータ1 (リスト内の要素について、各々状態0, 1, 2)
+        sigma = [1, 1, 1]      # パラメータ2 (")
+        rate_hmm, state = [[8/10, 1/10, 1/10], [1/10, 8/10, 1/10], [1/10, 1/10, 8/10]], 0   # 初期状態が0で、維持しやすい。
+        #rate_hmm, state = [[1/10, 7/10, 2/10], [5/10, 1/10, 4/10], [3/10, 6/10, 1/10]], 0   # 初期状態が0で、遷移しやすい。やや、状態2に遷移しやすい。
+        state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
+        print('乱数列')
+        print(sampling.sample_list[:40])        # 最初は初期状態が維持されることを確認するため、sample_list[:n]
+        print('状態列')
+        print(state_list[:40])
 
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''
