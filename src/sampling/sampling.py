@@ -148,38 +148,12 @@ def sample_hmm(mu, sigma, rate, state):
     else:
         for i in range(sample_size):
             random_ = np.random.rand()     # プロダクトコード:  一様分布乱数を出力.
-            # テスト用コード
-            # -------------------------
-            #random_ = rate[0][0]    # テストパターン1 (fixed): 初期状態が0で、状態遷移しない。
-            #random_ = rate[1][0] if i % 2 == 0 else rate[0][1]  # テストパターン2 (fixed): 初期状態が0で、状態0と1が交互に入れ換わる。
-            #random_ = rate[1][1]    # テストパターン3 (fixed): 初期状態が1で、状態遷移しない。
-            #random_ = rate[0][1] if i % 2 == 0 else rate[1][0] # テストパターン4 (fixed): 初期状態が1で、状態0と1が交互に入れ換わる。
-            #random_ = np.random.rand() * rate[0][0]    # テストパターン5 (limited): 初期状態が0で、状態を維持する。
-            #random_ = np.random.rand() * (1.0-(rate[1][1])) + rate[1][1] # テストパターン6 (limited): 初期状態が0で、遷移後は状態1を維持する。
-            #random_ = np.random.rand() * (1.0-rate[1][1]) + rate[1][1]  # テストパターン7 (limited): 初期状態が1で、状態を維持する。
-            #random_ = np.random.rand() * rate[0][0] # テストパターン8 (limited): 初期状態が1で、遷移後は状態0を維持する。
-            #random_ = np.random.rand() * (rate[0][0]+1/10) # テストパターン9 (limited): 初期状態が0で、状態0を維持しやすい。
-            #random_ = np.random.rand() * (1.0-(rate[1][1]-1/10)) + (rate[1][1]-1/10) # テストパターン10 (limited): 初期状態が0で、状態1を維持しやすい。
-            #random_ = np.random.rand() * (1.0-(rate[1][1]-1/10)) + (rate[1][1]-1/10) # テストパターン11 (limited): 初期状態が1で、状態1を維持しやすい。
-            #random_ = np.random.rand() * (rate[0][0]+1/10)  # テストパターン12 (limited): 初期状態が1で、状態0を維持しやすい。
-            # -------------------------
             # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
             # 三項演算子について、
             # if文  : 状態維持
             # - 一番始めは初期状態を維持するため、条件にi == 0をorで追加.
-            # - rate[state][state-1] < random_ <= rate[state][state+1] の時、状態維持.
-            # - 遷移行列のrate[0][0], rate[len(rate)-1][len(rate)-1]の時、各々場合分けして処理.→ 　各々0, 1を出力.
             # else文: 状態遷移
             # - ↑それ以外の時、状態遷移.
-            #state = state if ((i == 0) or   \  # 三項演算子について、if文内の条件が!=. ↓下記は==.
-            #                  ((rate[state][state-1] if state != 0 else 0) < random_ <=  \
-            #                        (rate[state][state+1] if state != len(rate)-1 else 1)))   \
-            #              else int(format(~state & 0x1, '01b'))
-            #2021.10.31: FIXME:  ↓下記コードだと、状態1の場合について状態が維持される確率は、a11が大きくなることで逆に低くなっている。
-            #state = state if ((i == 0) or   \
-            #                  ((0 if state == 0 else rate[state][state]) <= random_ <=  \
-            #                        (1 if state == len(rate)-1 else rate[state][state])))   \
-            #              else int(format(~state & 0x1, '01b'))
             state = state if ((i == 0) or (0 <= random_ <= rate[state][state]))  \
                             else int(format(~state & 0x1, '01b'))
             state_list.append(state)    # テストコード用: i回目での状態を追加.
@@ -230,9 +204,9 @@ def main():
     state_list = sample_hmm(mu = [0, 10],                                # HMMのサンプリング
                sigma = [1, 1],
                # ↓FIXME: 2021.10.31: [実行結果]: 状態0に留まりやすく、1に留まりにくい。
-               #rate = [[9/10, 1/10], [1/10, 9/10]],    # テストパターン1, 3に類似 (ある状態aに留まりやすい
+               rate = [[9/10, 1/10], [1/10, 9/10]],    # テストパターン1, 3に類似 (ある状態aに留まりやすい
                # ↓FIXME: 2021.10.31: [実行結果]: 状態1に留まりやすく、0に留まりにくい。
-               rate = [[1/10, 9/10], [9/10, 1/10]],    # テストパターン2, 4に類似 (状態遷移しやすい
+               #rate = [[1/10, 9/10], [9/10, 1/10]],    # テストパターン2, 4に類似 (状態遷移しやすい
                state = 1
               )
     #print(sample_list[-10:])

@@ -133,28 +133,6 @@ class TestSampling(unittest.TestCase):
             sampling.sample_list = [10]                 # HMMのサンプリング
             sampling.sample_hmm(mu, sigma, rate_hmm)
 
-    def _test_sample_hmm_fixed_state_by_init_state(self):
-        '''
-        関数sampling/sample_hmmについて、遷移行列を一般の正方行列にした場合、
-        正しくサンプリングされるかテスト.
-
-        Notes
-        -----
-        - ただし、初期状態を0で固定し、状態遷移はしないものとする.
-        - ↑想定される挙動例1: 初期状態を0とした場合、ずっと状態0 (例.期待値0) のまま.
-        - ↑想定される挙動例2: rate_hmmは事実上適用されないのと同じ. → 遷移行列が単位行列[[a11,a12],[a21,a22]] = [[1,0],[0,1]]
-        - また、仮定する状態数を2とする.
-        '''
-        # HMMで定義する各状態の分布
-        mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
-        sigma = [1, 1]      # パラメータ2 (")
-        rate_hmm = [[9/10, 1/10], [1/10, 9/10]]   # [＊]: このテスト関数内では遷移行列の設定は事実上意味がない. 単位行列で固定.
-        sampling.sample_list = []                 # HMMのサンプリング
-        sampling.sample_hmm(mu, sigma, rate_hmm)
-        print('HMMのサンプリング')
-        print(sampling.sample_list[-20:])
-        #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
-
     def _test_sample_hmm_applied_rate_hmm(self):
         '''
         関数sampling/sample_hmmについて、hmm_rateを設定して正しくサンプリングされるかテスト.
@@ -176,78 +154,6 @@ class TestSampling(unittest.TestCase):
         print('HMMのサンプリング')
         print(sampling.sample_list[:20])        # 最初は初期状態が維持されることを確認するため、sample_list[:n]
         #self.assertAlmostEqual(sampling.sample_hmm(mu, sigma, rate_hmm), sampling.sample_mixed_gauss(mu, sigma, rate_gmm))
-
-    def _test_sample_hmm_by_fixed_random_number(self):
-        '''
-        関数sampling/sample_hmmについて、関数内の乱数を固定して正しくサンプリングされるかテスト.
-
-        Notes
-        -----
-        - 仮定する状態数を2とする.
-        '''
-        # HMMで定義する各状態の分布
-        mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
-        sigma = [1, 1]      # パラメータ2 (")
-        rate_hmm = [[4/10, 6/10], [3/10, 7/10]]       # 遷移行列
-        state =  0                                              # テストパターン1: 初期状態が0で、状態遷移しない。
-        state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        test_list = [0 for i in range(40)]  # テスト数列
-        self.assertEqual(state_list[:40], test_list)
-        #state = 0                                              # テストパターン2: 初期状態が0で、状態0と1が交互に入れ換わる。
-        #state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        #test_list = [0 if i % 2 == 0 else 1 for i in range(40)]    # テスト数列
-        #print('テスト数列: テストパターン2')
-        #print(test_list)
-        #self.assertEqual(state_list[:40], test_list)
-        #state =  1                                              # テストパターン3: 初期状態が1で、状態遷移しない。
-        #state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        #test_list = [1 for i in range(40)]  # テスト数列
-        #self.assertEqual(state_list[:40], test_list)
-        #print('テスト数列: テストパターン3')
-        #print(test_list)
-        #state = 1                                              # テストパターン4: 初期状態が1で、状態0と1が交互に入れ換わる。
-        #state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        #test_list = [1 if i % 2 == 0 else 0 for i in range(40)] # テスト数列
-        #print('テスト数列: テストパターン4')
-        #print(test_list)
-        self.assertEqual(state_list[:40], test_list)
-        print('state_list')
-        print(state_list[:40])
-
-    def _test_sample_hmm_by_limited_random_number(self):
-        '''
-        関数sampling/sample_hmmについて、関数内の乱数の生成範囲を制限して正しくサンプリングされるかテスト.
-
-        Notes
-        -----
-        - 仮定する状態数を2とする.
-        '''
-        # HMMで定義する各状態の分布
-        mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
-        sigma = [1, 1]      # パラメータ2 (")
-        rate_hmm = [[4/10, 6/10], [3/10, 7/10]]       # 遷移行列
-        #state = 0  # 初期状態
-        #state =  1  # 初期状態
-        state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        print('state_list')
-        print(state_list[:40])
-
-    def test_sample_hmm_by_same_rate_hmm_in_product_code(self):
-        '''
-        関数sampling/sample_hmmについて、rate_hmmをプロダクトコードのそれと等しくして挙動をテスト.
-
-        - 仮定する状態数を2とする.
-        '''
-        # HMMで定義する各状態の分布
-        mu = [0, 10]        # パラメータ1 (リスト内の要素について、各々状態1, 2)
-        sigma = [1, 1]      # パラメータ2 (")
-        #rate_hmm = [[9/10, 1/10], [1/10, 9/10]]       # 遷移行列: 状態を維持しやすい
-        rate_hmm = [[1/10, 9/10], [9/10, 1/10]]       # 遷移行列: 状態遷移しやすい
-        #state = 0  # 初期状態
-        state =  1  # 初期状態
-        state_list = sampling.sample_hmm(mu, sigma, rate_hmm, state)
-        print('state_list')
-        print(state_list[:40])
 
     def _test_metropolis_given_multidim_density_function_whose_parameter_is_solo(self):
         '''
