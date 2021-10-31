@@ -148,18 +148,18 @@ def sample_hmm(mu, sigma, rate, state):
     else:
         for i in range(sample_size):
             #random_ = np.random.rand()     # プロダクトコード:  一様分布乱数を出力.
-            #random_ = rate[0][0]    # テストパターン1 (fixed): 初期状態が0で、状態遷移しない。
+            random_ = rate[0][0]    # テストパターン1 (fixed): 初期状態が0で、状態遷移しない。
             #random_ = rate[1][0] if i % 2 == 0 else rate[0][1]  # テストパターン2 (fixed): 初期状態が0で、状態0と1が交互に入れ換わる。
             #random_ = rate[1][1]    # テストパターン3 (fixed): 初期状態が1で、状態遷移しない。
             #random_ = rate[0][1] if i % 2 == 0 else rate[1][0] # テストパターン4 (fixed): 初期状態が1で、状態0と1が交互に入れ換わる。
-            #random_ = np.random.rand() * rate[0][0]    # テストパターン1 (limited): 初期状態が0で、状態を維持する。
-            #random_ = np.random.rand() * (1.0-(rate[0][1]+1/10)) + rate[0][1]+1/10 # テストパターン2 (limited): 初期状態が0で、遷移後は状態1を維持する。
-            #random_ = np.random.rand() * (1.0-rate[1][1]) + rate[1][1]  # テストパターン3 (limited): 初期状態が1で、状態を維持する。
-            #random_ = np.random.rand() * rate[0][0] # テストパターン4 (limited): 初期状態が1で、遷移後は状態0を維持する。
-            #random_ = np.random.rand() * (rate[0][0]+1/10) # テストパターン5 (limited): 初期状態が0で、状態0を維持しやすい。
-            #random_ = np.random.rand() * (1.0-(rate[1][1]-1/10)) + (rate[1][1]-1/10) # テストパターン6 (limited): 初期状態が0で、状態1を維持しやすい。
-            #random_ = np.random.rand() * (1.0-(rate[1][1]-1/10)) + (rate[1][1]-1/10) # テストパターン7 (limited): 初期状態が1で、状態1を維持しやすい。
-            random_ = np.random.rand() * (rate[0][0]+1/10)  # テストパターン8 (limited): 初期状態が1で、状態0を維持しやすい。
+            #random_ = np.random.rand() * rate[0][0]    # テストパターン5 (limited): 初期状態が0で、状態を維持する。
+            #random_ = np.random.rand() * (1.0-(rate[1][1])) + rate[1][1] # テストパターン6 (limited): 初期状態が0で、遷移後は状態1を維持する。
+            #random_ = np.random.rand() * (1.0-rate[1][1]) + rate[1][1]  # テストパターン7 (limited): 初期状態が1で、状態を維持する。
+            #random_ = np.random.rand() * rate[0][0] # テストパターン8 (limited): 初期状態が1で、遷移後は状態0を維持する。
+            #random_ = np.random.rand() * (rate[0][0]+1/10) # テストパターン9 (limited): 初期状態が0で、状態0を維持しやすい。
+            #random_ = np.random.rand() * (1.0-(rate[1][1]-1/10)) + (rate[1][1]-1/10) # テストパターン10 (limited): 初期状態が0で、状態1を維持しやすい。
+            #random_ = np.random.rand() * (1.0-(rate[1][1]-1/10)) + (rate[1][1]-1/10) # テストパターン11 (limited): 初期状態が1で、状態1を維持しやすい。
+            #random_ = np.random.rand() * (rate[0][0]+1/10)  # テストパターン12 (limited): 初期状態が1で、状態0を維持しやすい。
             # HACK: 2021.10.27 22:15頃: 2状態を仮定しているため、状態遷移はビット演算を用いて実現.
             # 三項演算子について、
             # if文  : 状態維持
