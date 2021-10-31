@@ -154,15 +154,22 @@ def sample_hmm(mu, sigma, rate, state):
             # - 一番始めは初期状態を維持するため、条件にi == 0をorで追加.
             # else文: 状態遷移
             # - ↑それ以外の時、状態遷移.
-            state = state if ((i == 0) or (0 <= random_ <= rate[state][state]))  \
-                            else int(format(~state & 0x1, '01b'))
+            if ((i == 0) or (0 <= random_ <= rate[state][state])):  # 状態維持
+                pass
+            else:   # 状態遷移
+                sum_ = 0
+                for i in range(len(rate)):
+                    if sum_ < random_ < rate[state][i]+sum_ and state != i:
+                    # 2021.10.16: Notice: ↑内包表記で書こうと試みたが...
+                    # if [sum_ < u < rate[i]+sum_ for i in range(len(rate))].any():
+                    # 注1. anyは標準リストではサポートなし。
+                    # また、内包表記ではすべての要素を見るため効率が悪い。
+                    # 適当なインデックスをif文に検知させるのも難しそう。
+                    # 注2. 逆に、for文による内包表記の中にif文を組み込むのは、よくあるやり方。
+                        state = i
+                        break
+                    sum_ += rate[state][i]
             state_list.append(state)    # テストコード用: i回目での状態を追加.
-            if dim == 'solo':
-                sample_list.append(np.random.normal(mu[state], sigma[state]))
-            elif dim == 'multi':
-                sample_list.append(np.random.multivariate_normal(mu[state], sigma[state], 1).tolist()[0])
-            else:
-                raise Exception('関数内ローカル変数dimの設定が正しくありません.')
     return state_list   # テストコード用: 状態遷移の履歴を出力.
 
 
